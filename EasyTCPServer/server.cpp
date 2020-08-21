@@ -107,26 +107,28 @@ int main()
 	while (true)
 	{
 		// 接收数据
-		DataHeader header{};
-		int nLen = recv(_cSock, (char*)&header, sizeof(DataHeader), 0);
+		char szRecv[1024]{};
+		int nLen = recv(_cSock, szRecv, sizeof(DataHeader), 0);
 		if (nLen <= 0) {
 			cout << "客户端已退出，结束任务！" << endl;
 			break;
 		}
+		// if (nLen >= sizeof(DataHeader)) 可能少包
+		DataHeader* header = (DataHeader*)szRecv;
 
 		// 处理请求
-		cout << "收到命令：" << header.cmd << " "
-			<< "数据长度：" << header.len << endl;
-		switch (header.cmd)
+		cout << "收到命令：" << header->cmd << " "
+			<< "数据长度：" << header->len << endl;
+		switch (header->cmd)
 		{
 		case CMD_LOGIN:
 		{
 			// 接收数据
-			Login login{};
-			recv(_cSock, (char*)&login + sizeof(DataHeader), sizeof(Login) - sizeof(DataHeader), 0);
-			cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header.len << endl
-				<< "username=" << login.username << " "
-				<< "password=" << login.password << endl;
+			recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
+			Login* login = (Login*)szRecv;
+			cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header->len << endl
+				<< "username=" << login->username << " "
+				<< "password=" << login->password << endl;
 
 			// 发送数据
 			LoginResult res;
@@ -136,21 +138,20 @@ int main()
 		case CMD_LOGOUT:
 		{
 			// 接收数据
-			Logout logout{};
-			recv(_cSock, (char*)&logout + sizeof(DataHeader), sizeof(Logout) - sizeof(DataHeader), 0);
-			cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header.len << endl
-				<< "username=" << logout.username << endl;
+			recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
+			Logout* logout = (Logout*)szRecv;
+			cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header->len << endl
+				<< "username=" << logout->username << endl;
 
 			// 发送数据
-			header.len = sizeof(LogoutResult);
-			LogoutResult res{};
+			LogoutResult res;
 			send(_cSock, (const char*)&res, sizeof(LogoutResult), 0);
 		}
 		break;
 		default:
 		{
-			header.cmd = CMD_ERROR;
-			header.len = 0;
+			header->cmd = CMD_ERROR;
+			header->len = 0;
 			send(_cSock, (const char*)&header, sizeof(DataHeader), 0);
 		}
 		break;
