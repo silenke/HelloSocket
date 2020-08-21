@@ -43,21 +43,43 @@ int main()
 	int addrLen = sizeof(sockaddr_in);
 	SOCKET _cSock = INVALID_SOCKET;
 
-	char buffer[] = "Hello!";
+	// 接受连接
+	_cSock = accept(_sock, (sockaddr*)&clientAddr, &addrLen);
+	if (INVALID_SOCKET == _cSock) {
+		cout << "错误，接收到无效的客户端！" << endl;
+	}
+	cout << "新客户端加入，IP：" << inet_ntoa(clientAddr.sin_addr) << endl;
+
 	while (true)
 	{
-		// 接受连接
-		_cSock = accept(_sock, (sockaddr*)&clientAddr, &addrLen);
-		if (INVALID_SOCKET == _cSock) {
-			cout << "错误，接收到无效的客户端！" << endl;
+		// 接收数据
+		char _recvBuff[128]{};
+		int nLen = recv(_cSock, _recvBuff, 128, 0);
+		if (nLen <= 0) {
+			cout << "客户端已退出，结束任务！" << endl;
+			break;
 		}
-		cout << "新客户端加入，IP：" << inet_ntoa(clientAddr.sin_addr) << endl;
 		
+		// 处理请求
+		char _sendBuff[128]{};
+		if (0 == strcmp(_recvBuff, "getName")) {
+			strcpy_s(_sendBuff, "Peppa Pig");
+		}
+		else if (0 == strcmp(_recvBuff, "getAge")) {
+			strcpy_s(_sendBuff, "24");
+		}
+		else {
+			strcpy_s(_sendBuff, "???");
+		}
+
 		// 发送数据
-		send(_cSock, buffer, sizeof(buffer) + 1, 0);
+		send(_cSock, _sendBuff, strlen(_sendBuff) + 1, 0);
 	}
 
 	// 清理套接字库
 	WSACleanup();
+	cout << "已退出！" << endl;
+	
+	getchar();
 	return 0;
 }

@@ -29,15 +29,27 @@ int main()
 	_sin.sin_port = htons(6100);
 	_sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 	if (SOCKET_ERROR == connect(_sock, (sockaddr*)&_sin, sizeof(_sin))) {
-		cout << "错误，连接端口失败！" << endl;
+		cout << "错误，连接服务器失败！" << endl;
 	}
-	cout << "连接端口成功！" << endl;
+	cout << "连接服务器成功！" << endl;
 
-	// 接收数据
-	char buffer[256] = {};
-	int len = recv(_sock, buffer, 256, 0);
-	if (len > 0) {
-		cout << "接收到数据：" << buffer << endl;
+	while (true)
+	{
+		// 发送数据
+		char cmdBuff[128]{};
+		cin >> cmdBuff;
+		if (0 == strcmp(cmdBuff, "exit")) {
+			cout << "收到退出命令，结束任务！" << endl;
+			break;
+		}
+		send(_sock, cmdBuff, strlen(cmdBuff), 0);
+
+		// 接收数据
+		char recvBuff[128] = {};
+		int nLen = recv(_sock, recvBuff, 128, 0);
+		if (nLen > 0) {
+			cout << "接收到数据：" << recvBuff << endl;
+		}
 	}
 
 	// 关闭套接字
@@ -45,6 +57,7 @@ int main()
 
 	// 清理套接字库
 	WSACleanup();
+	cout << "已退出！" << endl;
 
 	getchar();
 	return 0;
