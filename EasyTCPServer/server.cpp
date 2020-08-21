@@ -9,6 +9,12 @@
 
 using namespace std;
 
+struct DataPackage
+{
+	int age;
+	char name[32];
+};
+
 int main()
 {
 	// 初始化套接字库
@@ -32,7 +38,7 @@ int main()
 		cout << "错误，绑定端口失败！" << endl;
 	}
 	cout << "绑定端口成功！" << endl;
-	
+
 	// 监听端口
 	if (SOCKET_ERROR == listen(_sock, 5)) {
 		cout << "错误，监听端口失败！" << endl;
@@ -59,27 +65,22 @@ int main()
 			cout << "客户端已退出，结束任务！" << endl;
 			break;
 		}
-		
+
 		// 处理请求
-		char _sendBuff[128]{};
-		if (0 == strcmp(_recvBuff, "getName")) {
-			strcpy_s(_sendBuff, "Peppa Pig");
-		}
-		else if (0 == strcmp(_recvBuff, "getAge")) {
-			strcpy_s(_sendBuff, "24");
+		if (!strcmp(_recvBuff, "getInfo")) {
+			// 发送数据
+			DataPackage dp{24, "Peppa"};
+			send(_cSock, (const char*)&dp, sizeof(DataPackage), 0);
 		}
 		else {
-			strcpy_s(_sendBuff, "???");
+			send(_cSock, "???", strlen("???") + 1, 0);
 		}
-
-		// 发送数据
-		send(_cSock, _sendBuff, strlen(_sendBuff) + 1, 0);
 	}
 
 	// 清理套接字库
 	WSACleanup();
 	cout << "已退出！" << endl;
-	
+
 	getchar();
 	return 0;
 }

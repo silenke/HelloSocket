@@ -9,6 +9,12 @@
 
 using namespace std;
 
+struct DataPackage
+{
+	int age;
+	char name[32];
+};
+
 int main()
 {
 	// 初始化套接字库
@@ -48,7 +54,9 @@ int main()
 		char recvBuff[128] = {};
 		int nLen = recv(_sock, recvBuff, 128, 0);
 		if (nLen > 0) {
-			cout << "接收到数据：" << recvBuff << endl;
+			DataPackage* dp = (DataPackage*)recvBuff;
+			cout << "接收到数据，" <<  "年龄：" << dp->age
+				 << " 姓名：" << dp->name << endl;
 		}
 	}
 
