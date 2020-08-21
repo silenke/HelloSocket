@@ -9,10 +9,38 @@
 
 using namespace std;
 
-struct DataPackage
+enum CMD
 {
-	int age;
-	char name[32];
+	CMD_LOGIN,
+	CMD_LOGOUT,
+	CMD_ERROR
+};
+
+struct DataHeader
+{
+	short cmd;
+	short len;
+};
+
+struct Login
+{
+	char username[32];
+	char password[32];
+};
+
+struct LoginResult
+{
+	int result;
+};
+
+struct Logout
+{
+	char username[32];
+};
+
+struct LogoutResult
+{
+	int result;
 };
 
 int main()
@@ -59,21 +87,51 @@ int main()
 	while (true)
 	{
 		// 接收数据
-		char _recvBuff[128]{};
-		int nLen = recv(_cSock, _recvBuff, 128, 0);
+		DataHeader header{};
+		int nLen = recv(_cSock, (char*)&header, sizeof(DataHeader), 0);
 		if (nLen <= 0) {
 			cout << "客户端已退出，结束任务！" << endl;
 			break;
 		}
 
 		// 处理请求
-		if (!strcmp(_recvBuff, "getInfo")) {
+		cout << "收到命令：" << header.cmd << " "
+			<< "数据长度：" << header.len << endl;
+		switch (header.cmd)
+		{
+		case CMD_LOGIN:
+		{
+			// 接收数据
+			Login login{};
+			recv(_cSock, (char*)&login, sizeof(Login), 0);
+
 			// 发送数据
-			DataPackage dp{24, "Peppa"};
-			send(_cSock, (const char*)&dp, sizeof(DataPackage), 0);
+			header.len = sizeof(LoginResult);
+			LoginResult res{ 0 };
+			send(_cSock, (const char*)&header, sizeof(DataHeader), 0);
+			send(_cSock, (const char*)&res, sizeof(LoginResult), 0);
 		}
-		else {
-			send(_cSock, "???", strlen("???") + 1, 0);
+		break;
+		case CMD_LOGOUT:
+		{
+			// 接收数据
+			Logout logout{};
+			recv(_cSock, (char*)&logout, sizeof(Logout), 0);
+
+			// 发送数据
+			header.len = sizeof(LogoutResult);
+			LogoutResult res{ 0 };
+			send(_cSock, (const char*)&header, sizeof(DataHeader), 0);
+			send(_cSock, (const char*)&res, sizeof(LogoutResult), 0);
+		}
+		break;
+		default:
+		{
+			header.cmd = CMD_ERROR;
+			header.len = 0;
+			send(_cSock, (const char*)&header, sizeof(DataHeader), 0);
+		}
+		break;
 		}
 	}
 

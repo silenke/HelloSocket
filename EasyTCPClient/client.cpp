@@ -9,10 +9,38 @@
 
 using namespace std;
 
-struct DataPackage
+enum CMD
 {
-	int age;
-	char name[32];
+	CMD_LOGIN,
+	CMD_LOGOUT,
+	CMD_ERROR
+};
+
+struct DataHeader
+{
+	short len;
+	short cmd;
+};
+
+struct Login
+{
+	char username[32];
+	char password[32];
+};
+
+struct LoginResult
+{
+	int result;
+};
+
+struct Logout
+{
+	char username[32];
+};
+
+struct LogoutResult
+{
+	int result;
 };
 
 int main()
@@ -41,22 +69,42 @@ int main()
 
 	while (true)
 	{
-		// 发送数据
 		char cmdBuff[128]{};
 		cin >> cmdBuff;
-		if (0 == strcmp(cmdBuff, "exit")) {
+		if (!strcmp(cmdBuff, "exit")) {
 			cout << "收到退出命令，结束任务！" << endl;
 			break;
 		}
-		send(_sock, cmdBuff, strlen(cmdBuff), 0);
+		else if (!strcmp(cmdBuff, "login")) {
+			// 发送数据
+			DataHeader dataHeader{ CMD_LOGIN, sizeof(Login) };
+			Login login{ "Peppa Pig", "15213" };
+			send(_sock, (const char*)&dataHeader, sizeof(DataHeader), 0);
+			send(_sock, (const char*)&login, sizeof(Login), 0);
 
-		// 接收数据
-		char recvBuff[128] = {};
-		int nLen = recv(_sock, recvBuff, 128, 0);
-		if (nLen > 0) {
-			DataPackage* dp = (DataPackage*)recvBuff;
-			cout << "接收到数据，" <<  "年龄：" << dp->age
-				 << " 姓名：" << dp->name << endl;
+			// 接收数据
+			DataHeader resHeader{};
+			LoginResult res{};
+			recv(_sock, (char*)&resHeader, sizeof(DataHeader), 0);
+			recv(_sock, (char*)&res, sizeof(LoginResult), 0);
+			cout << "LoginResult："  << res.result << endl;
+		}
+		else if (!strcmp(cmdBuff, "logout")) {
+			// 发送数据
+			DataHeader dataHeader{ CMD_LOGOUT, sizeof(Logout) };
+			Logout logout{ "Peppa Pig" };
+			send(_sock, (const char*)&dataHeader, sizeof(DataHeader), 0);
+			send(_sock, (const char*)&logout, sizeof(Logout), 0);
+
+			// 接收数据
+			DataHeader resHeader{};
+			LogoutResult res{};
+			recv(_sock, (char*)&resHeader, sizeof(DataHeader), 0);
+			recv(_sock, (char*)&res, sizeof(LogoutResult), 0);
+			cout << "LogoutResult：" << res.result << endl;
+		}
+		else {
+			cout << "不支持的命令，请重新输入！" << endl;
 		}
 	}
 
