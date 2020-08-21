@@ -12,34 +12,54 @@ using namespace std;
 enum CMD
 {
 	CMD_LOGIN,
+	CMD_LOGIN_RESULT,
 	CMD_LOGOUT,
+	CMD_LOGOUT_RESULT,
 	CMD_ERROR
 };
 
 struct DataHeader
 {
-	short len;
 	short cmd;
+	short len;
 };
 
-struct Login
+struct Login : public DataHeader
 {
+	Login() {
+		cmd = CMD_LOGIN;
+		len = sizeof(Login);
+	}
 	char username[32];
 	char password[32];
 };
 
-struct LoginResult
+struct LoginResult : public DataHeader
 {
+	LoginResult() {
+		cmd = CMD_LOGIN_RESULT;
+		len = sizeof(LoginResult);
+		result = 0;
+	}
 	int result;
 };
 
-struct Logout
+struct Logout : public DataHeader
 {
+	Logout() {
+		cmd = CMD_LOGOUT;
+		len = sizeof(Logout);
+	}
 	char username[32];
 };
 
-struct LogoutResult
+struct LogoutResult : public DataHeader
 {
+	LogoutResult() {
+		cmd = CMD_LOGOUT_RESULT;
+		len = sizeof(LogoutResult);
+		result = 0;
+	}
 	int result;
 };
 
@@ -77,29 +97,24 @@ int main()
 		}
 		else if (!strcmp(cmdBuff, "login")) {
 			// 发送数据
-			DataHeader dataHeader{ CMD_LOGIN, sizeof(Login) };
-			Login login{ "Peppa Pig", "15213" };
-			send(_sock, (const char*)&dataHeader, sizeof(DataHeader), 0);
+			Login login;
+			strcpy_s(login.username, "Peppa Pig");
+			strcpy_s(login.password, "15213");
 			send(_sock, (const char*)&login, sizeof(Login), 0);
 
 			// 接收数据
-			DataHeader resHeader{};
 			LoginResult res{};
-			recv(_sock, (char*)&resHeader, sizeof(DataHeader), 0);
 			recv(_sock, (char*)&res, sizeof(LoginResult), 0);
 			cout << "LoginResult："  << res.result << endl;
 		}
 		else if (!strcmp(cmdBuff, "logout")) {
 			// 发送数据
-			DataHeader dataHeader{ CMD_LOGOUT, sizeof(Logout) };
-			Logout logout{ "Peppa Pig" };
-			send(_sock, (const char*)&dataHeader, sizeof(DataHeader), 0);
+			Logout logout;
+			strcpy_s(logout.username, "Peppa Pig");
 			send(_sock, (const char*)&logout, sizeof(Logout), 0);
 
 			// 接收数据
-			DataHeader resHeader{};
 			LogoutResult res{};
-			recv(_sock, (char*)&resHeader, sizeof(DataHeader), 0);
 			recv(_sock, (char*)&res, sizeof(LogoutResult), 0);
 			cout << "LogoutResult：" << res.result << endl;
 		}

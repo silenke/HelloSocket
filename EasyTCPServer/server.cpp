@@ -12,7 +12,9 @@ using namespace std;
 enum CMD
 {
 	CMD_LOGIN,
+	CMD_LOGIN_RESULT,
 	CMD_LOGOUT,
+	CMD_LOGOUT_RESULT,
 	CMD_ERROR
 };
 
@@ -22,24 +24,42 @@ struct DataHeader
 	short len;
 };
 
-struct Login
+struct Login : public DataHeader
 {
+	Login() {
+		cmd = CMD_LOGIN;
+		len = sizeof(Login);
+	}
 	char username[32];
 	char password[32];
 };
 
-struct LoginResult
+struct LoginResult : public DataHeader
 {
+	LoginResult() {
+		cmd = CMD_LOGIN_RESULT;
+		len = sizeof(LoginResult);
+		result = 0;
+	}
 	int result;
 };
 
-struct Logout
+struct Logout : public DataHeader
 {
+	Logout() {
+		cmd = CMD_LOGOUT;
+		len = sizeof(Logout);
+	}
 	char username[32];
 };
 
-struct LogoutResult
+struct LogoutResult : public DataHeader
 {
+	LogoutResult() {
+		cmd = CMD_LOGOUT_RESULT;
+		len = sizeof(LogoutResult);
+		result = 0;
+	}
 	int result;
 };
 
@@ -103,12 +123,13 @@ int main()
 		{
 			// 接收数据
 			Login login{};
-			recv(_cSock, (char*)&login, sizeof(Login), 0);
+			recv(_cSock, (char*)&login + sizeof(DataHeader), sizeof(Login) - sizeof(DataHeader), 0);
+			cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header.len << endl
+				<< "username=" << login.username << " "
+				<< "password=" << login.password << endl;
 
 			// 发送数据
-			header.len = sizeof(LoginResult);
-			LoginResult res{ 0 };
-			send(_cSock, (const char*)&header, sizeof(DataHeader), 0);
+			LoginResult res;
 			send(_cSock, (const char*)&res, sizeof(LoginResult), 0);
 		}
 		break;
@@ -116,12 +137,13 @@ int main()
 		{
 			// 接收数据
 			Logout logout{};
-			recv(_cSock, (char*)&logout, sizeof(Logout), 0);
+			recv(_cSock, (char*)&logout + sizeof(DataHeader), sizeof(Logout) - sizeof(DataHeader), 0);
+			cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header.len << endl
+				<< "username=" << logout.username << endl;
 
 			// 发送数据
 			header.len = sizeof(LogoutResult);
-			LogoutResult res{ 0 };
-			send(_cSock, (const char*)&header, sizeof(DataHeader), 0);
+			LogoutResult res{};
 			send(_cSock, (const char*)&res, sizeof(LogoutResult), 0);
 		}
 		break;
