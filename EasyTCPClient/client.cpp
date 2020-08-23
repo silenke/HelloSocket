@@ -160,8 +160,7 @@ int main()
 		FD_ZERO(&fdRead);
 		FD_SET(_sock, &fdRead);
 
-		//timeval t{};
-		timeval t{ 1, 0 };
+		timeval t{};
 		int ret = select(_sock + 1, &fdRead, NULL, NULL, &t);
 		if (ret < 0)
 		{
@@ -176,11 +175,6 @@ int main()
 				break;
 			}
 		}
-
-		Login login;
-		strcpy_s(login.username, "Peppa Pig");
-		strcpy_s(login.password, "15213");
-		send(_sock, (const char*)&login, sizeof(Login), 0);
 
 		//char cmdBuff[128]{};
 		//cin >> cmdBuff;

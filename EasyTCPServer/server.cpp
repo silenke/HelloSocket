@@ -181,8 +181,7 @@ int main()
 			FD_SET(_csock, &fdRead);
 		}
 
-		//timeval t{};
-		timeval t{1, 0};
+		timeval t{};
 		int ret = select(_sock + 1, &fdRead, &fdWrite, &fdExp, &t);
 		if (ret < 0)
 		{
@@ -202,15 +201,18 @@ int main()
 			{
 				cout << "错误，接收到无效的客户端！" << endl;
 			}
-			NewUserJoin userJoin;
-			userJoin.sock = _cSock;
-			for (auto _cSock : g_clients)
+			else
 			{
-				send(_cSock, (const char*)&userJoin, sizeof(NewUserJoin), 0);
+				NewUserJoin userJoin;
+				userJoin.sock = _cSock;
+				for (auto _cSock : g_clients)
+				{
+					send(_cSock, (const char*)&userJoin, sizeof(NewUserJoin), 0);
+				}
+				g_clients.push_back(_cSock);
+				cout << "新客户端加入：socket = " << _cSock << "，"
+					<< "IP = " << inet_ntoa(clientAddr.sin_addr) << endl;
 			}
-			g_clients.push_back(_cSock);
-			cout << "新客户端加入：socket = " << _cSock << "，"
-				<< "IP = " << inet_ntoa(clientAddr.sin_addr) << endl;
 		}
 		for (auto _cSock : g_clients)
 		{
