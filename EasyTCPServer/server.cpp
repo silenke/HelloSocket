@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <WinSock2.h>
 #include <iostream>
+#include <vector>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -63,6 +64,65 @@ struct LogoutResult : public DataHeader
 	int result;
 };
 
+vector<SOCKET> g_clients;
+
+int processor(SOCKET _cSock)
+{
+	// 接收数据
+	char szRecv[1024]{};
+	int nLen = recv(_cSock, szRecv, sizeof(DataHeader), 0);
+	if (nLen <= 0) {
+		cout << "客户端已退出，结束任务！" << endl;
+		return -1;
+	}
+	// if (nLen >= sizeof(DataHeader)) 可能少包
+	DataHeader* header = (DataHeader*)szRecv;
+
+	// 处理请求
+	cout << "收到命令：" << header->cmd << " "
+		<< "数据长度：" << header->len << endl;
+
+	switch (header->cmd)
+	{
+	case CMD_LOGIN:
+	{
+		// 接收数据
+		recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
+		Login* login = (Login*)szRecv;
+		cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header->len << endl
+			<< "username=" << login->username << " "
+			<< "password=" << login->password << endl;
+
+		// 发送数据
+		LoginResult res;
+		send(_cSock, (const char*)&res, sizeof(LoginResult), 0);
+	}
+	break;
+	case CMD_LOGOUT:
+	{
+		// 接收数据
+		recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
+		Logout* logout = (Logout*)szRecv;
+		cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header->len << endl
+			<< "username=" << logout->username << endl;
+
+		// 发送数据
+		LogoutResult res;
+		send(_cSock, (const char*)&res, sizeof(LogoutResult), 0);
+	}
+	break;
+	default:
+	{
+		header->cmd = CMD_ERROR;
+		header->len = 0;
+		send(_cSock, (const char*)&header, sizeof(DataHeader), 0);
+	}
+	break;
+	}
+
+	return 0;
+}
+
 int main()
 {
 	// 初始化套接字库
@@ -93,70 +153,64 @@ int main()
 	}
 	cout << "监听端口成功！" << endl;
 
-	sockaddr_in clientAddr = {};
-	int addrLen = sizeof(sockaddr_in);
-	SOCKET _cSock = INVALID_SOCKET;
-
-	// 接受连接
-	_cSock = accept(_sock, (sockaddr*)&clientAddr, &addrLen);
-	if (INVALID_SOCKET == _cSock) {
-		cout << "错误，接收到无效的客户端！" << endl;
-	}
-	cout << "新客户端加入，IP：" << inet_ntoa(clientAddr.sin_addr) << endl;
-
 	while (true)
 	{
-		// 接收数据
-		char szRecv[1024]{};
-		int nLen = recv(_cSock, szRecv, sizeof(DataHeader), 0);
-		if (nLen <= 0) {
-			cout << "客户端已退出，结束任务！" << endl;
+		fd_set fdRead;
+		fd_set fdWrite;
+		fd_set fdExp;
+
+		FD_ZERO(&fdRead);
+		FD_ZERO(&fdWrite);
+		FD_ZERO(&fdExp);
+
+		FD_SET(_sock, &fdRead);
+		FD_SET(_sock, &fdWrite);
+		FD_SET(_sock, &fdExp);
+
+		for (auto _csock : g_clients) {
+			FD_SET(_csock, &fdRead);
+		}
+
+		timeval t{ 0, 0 };
+		int ret = select(_sock + 1, &fdRead, &fdWrite, &fdExp, &t);
+		if (ret < 0)
+		{
+			cout << "select任务结束！" << endl;
 			break;
 		}
-		// if (nLen >= sizeof(DataHeader)) 可能少包
-		DataHeader* header = (DataHeader*)szRecv;
+		if (FD_ISSET(_sock, &fdRead))
+		{
+			FD_CLR(_sock, &fdRead);
+			// 接受连接
+			sockaddr_in clientAddr = {};
+			int addrLen = sizeof(sockaddr_in);
+			SOCKET _cSock = INVALID_SOCKET;
 
-		// 处理请求
-		cout << "收到命令：" << header->cmd << " "
-			<< "数据长度：" << header->len << endl;
-		switch (header->cmd)
-		{
-		case CMD_LOGIN:
-		{
-			// 接收数据
-			recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
-			Login* login = (Login*)szRecv;
-			cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header->len << endl
-				<< "username=" << login->username << " "
-				<< "password=" << login->password << endl;
-
-			// 发送数据
-			LoginResult res;
-			send(_cSock, (const char*)&res, sizeof(LoginResult), 0);
+			_cSock = accept(_sock, (sockaddr*)&clientAddr, &addrLen);
+			if (INVALID_SOCKET == _cSock)
+			{
+				cout << "错误，接收到无效的客户端！" << endl;
+			}
+			g_clients.push_back(_cSock);
+			cout << "新客户端加入：socket = " << _cSock << "，"
+				<< "IP = " << inet_ntoa(clientAddr.sin_addr) << endl;
 		}
-		break;
-		case CMD_LOGOUT:
+		for (auto _cSock : g_clients)
 		{
-			// 接收数据
-			recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
-			Logout* logout = (Logout*)szRecv;
-			cout << "收到命令：CMD_LOGIN，" << "数据长度：" << header->len << endl
-				<< "username=" << logout->username << endl;
-
-			// 发送数据
-			LogoutResult res;
-			send(_cSock, (const char*)&res, sizeof(LogoutResult), 0);
-		}
-		break;
-		default:
-		{
-			header->cmd = CMD_ERROR;
-			header->len = 0;
-			send(_cSock, (const char*)&header, sizeof(DataHeader), 0);
-		}
-		break;
+			if (FD_ISSET(_cSock, &fdRead) && -1 == processor(_cSock))
+			{
+				auto it = find(g_clients.begin(), g_clients.end(), _cSock);
+				if (it != g_clients.end()) g_clients.erase(it);
+			}
 		}
 	}
+
+	// 关闭套接字
+	for (auto _cSock : g_clients)
+	{
+		closesocket(_cSock);
+	}
+	closesocket(_sock);
 
 	// 清理套接字库
 	WSACleanup();
