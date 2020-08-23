@@ -15,6 +15,7 @@ enum CMD
 	CMD_LOGIN_RESULT,
 	CMD_LOGOUT,
 	CMD_LOGOUT_RESULT,
+	CMD_NEW_USER_JOIN,
 	CMD_ERROR
 };
 
@@ -63,6 +64,72 @@ struct LogoutResult : public DataHeader
 	int result;
 };
 
+struct NewUserJoin : public DataHeader
+{
+	NewUserJoin() {
+		cmd = CMD_NEW_USER_JOIN;
+		len = sizeof(CMD_NEW_USER_JOIN);
+	}
+	int sock;
+};
+
+int processor(SOCKET _cSock)
+{
+	// 接收数据
+	char szRecv[1024]{};
+	int nLen = recv(_cSock, szRecv, sizeof(DataHeader), 0);
+	if (nLen <= 0) {
+		cout << "与服务器断开连接，结束任务！" << endl;
+		return -1;
+	}
+	// if (nLen >= sizeof(DataHeader)) 可能少包
+	DataHeader* header = (DataHeader*)szRecv;
+
+	// 处理请求
+	cout << "收到命令：" << header->cmd << " "
+		<< "数据长度：" << header->len << endl;
+
+	switch (header->cmd)
+	{
+	case CMD_LOGIN_RESULT:
+	{
+		// 接收数据
+		recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
+		LoginResult* login = (LoginResult*)szRecv;
+		cout << "收到命令：CMD_LOGIN_RESULT，" << "数据长度：" << header->len << endl;
+	}
+	break;
+	case CMD_LOGOUT_RESULT:
+	{
+		// 接收数据
+		recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
+		LogoutResult* logout = (LogoutResult*)szRecv;
+		cout << "收到命令：CMD_LOGOUT_RESULT，" << "数据长度：" << header->len << endl;
+	}
+	break;
+	case CMD_NEW_USER_JOIN:
+	{
+		// 接收数据
+		recv(_cSock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
+		NewUserJoin* userJoin = (NewUserJoin*)szRecv;
+		cout << "收到命令：CMD_NEW_USER_JOIN，" << "数据长度：" << header->len << endl;
+	}
+	break;
+	case CMD_ERROR:
+	{
+		cout << "收到命令：CMD_ERROR，" << "数据长度：" << header->len << endl;
+	}
+	break;
+	default:
+	{
+		cout << "收到未知命令，" << "数据长度：" << header->len << endl;
+	}
+	break;
+	}
+
+	return 0;
+}
+
 int main()
 {
 	// 初始化套接字库
@@ -89,38 +156,64 @@ int main()
 
 	while (true)
 	{
-		char cmdBuff[128]{};
-		cin >> cmdBuff;
-		if (!strcmp(cmdBuff, "exit")) {
-			cout << "收到退出命令，结束任务！" << endl;
+		fd_set fdRead;
+		FD_ZERO(&fdRead);
+		FD_SET(_sock, &fdRead);
+
+		//timeval t{};
+		timeval t{ 1, 0 };
+		int ret = select(_sock + 1, &fdRead, NULL, NULL, &t);
+		if (ret < 0)
+		{
+			cout << "select任务结束！" << endl;
 			break;
 		}
-		else if (!strcmp(cmdBuff, "login")) {
-			// 发送数据
-			Login login;
-			strcpy_s(login.username, "Peppa Pig");
-			strcpy_s(login.password, "15213");
-			send(_sock, (const char*)&login, sizeof(Login), 0);
+		if (FD_ISSET(_sock, &fdRead))
+		{
+			FD_CLR(_sock, &fdRead);
+			if (-1 == processor(_sock))
+			{
+				break;
+			}
+		}
 
-			// 接收数据
-			LoginResult res{};
-			recv(_sock, (char*)&res, sizeof(LoginResult), 0);
-			cout << "LoginResult："  << res.result << endl;
-		}
-		else if (!strcmp(cmdBuff, "logout")) {
-			// 发送数据
-			Logout logout;
-			strcpy_s(logout.username, "Peppa Pig");
-			send(_sock, (const char*)&logout, sizeof(Logout), 0);
+		Login login;
+		strcpy_s(login.username, "Peppa Pig");
+		strcpy_s(login.password, "15213");
+		send(_sock, (const char*)&login, sizeof(Login), 0);
 
-			// 接收数据
-			LogoutResult res{};
-			recv(_sock, (char*)&res, sizeof(LogoutResult), 0);
-			cout << "LogoutResult：" << res.result << endl;
-		}
-		else {
-			cout << "不支持的命令，请重新输入！" << endl;
-		}
+		//char cmdBuff[128]{};
+		//cin >> cmdBuff;
+		//if (!strcmp(cmdBuff, "exit")) {
+		//	cout << "收到退出命令，结束任务！" << endl;
+		//	break;
+		//}
+		//else if (!strcmp(cmdBuff, "login")) {
+		//	// 发送数据
+		//	Login login;
+		//	strcpy_s(login.username, "Peppa Pig");
+		//	strcpy_s(login.password, "15213");
+		//	send(_sock, (const char*)&login, sizeof(Login), 0);
+
+		//	// 接收数据
+		//	LoginResult res{};
+		//	recv(_sock, (char*)&res, sizeof(LoginResult), 0);
+		//	cout << "LoginResult："  << res.result << endl;
+		//}
+		//else if (!strcmp(cmdBuff, "logout")) {
+		//	// 发送数据
+		//	Logout logout;
+		//	strcpy_s(logout.username, "Peppa Pig");
+		//	send(_sock, (const char*)&logout, sizeof(Logout), 0);
+
+		//	// 接收数据
+		//	LogoutResult res{};
+		//	recv(_sock, (char*)&res, sizeof(LogoutResult), 0);
+		//	cout << "LogoutResult：" << res.result << endl;
+		//}
+		//else {
+		//	cout << "不支持的命令，请重新输入！" << endl;
+		//}
 	}
 
 	// 关闭套接字

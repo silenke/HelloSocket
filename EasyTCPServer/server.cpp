@@ -16,6 +16,7 @@ enum CMD
 	CMD_LOGIN_RESULT,
 	CMD_LOGOUT,
 	CMD_LOGOUT_RESULT,
+	CMD_NEW_USER_JOIN,
 	CMD_ERROR
 };
 
@@ -64,6 +65,15 @@ struct LogoutResult : public DataHeader
 	int result;
 };
 
+struct NewUserJoin : public DataHeader
+{
+	NewUserJoin() {
+		cmd = CMD_NEW_USER_JOIN;
+		len = sizeof(NewUserJoin);
+	}
+	int sock;
+};
+
 vector<SOCKET> g_clients;
 
 int processor(SOCKET _cSock)
@@ -72,7 +82,7 @@ int processor(SOCKET _cSock)
 	char szRecv[1024]{};
 	int nLen = recv(_cSock, szRecv, sizeof(DataHeader), 0);
 	if (nLen <= 0) {
-		cout << "客户端已退出，结束任务！" << endl;
+		cout << "客户端（" << _cSock << "）已退出，结束任务！" << endl;
 		return -1;
 	}
 	// if (nLen >= sizeof(DataHeader)) 可能少包
@@ -171,7 +181,8 @@ int main()
 			FD_SET(_csock, &fdRead);
 		}
 
-		timeval t{ 0, 0 };
+		//timeval t{};
+		timeval t{1, 0};
 		int ret = select(_sock + 1, &fdRead, &fdWrite, &fdExp, &t);
 		if (ret < 0)
 		{
@@ -190,6 +201,12 @@ int main()
 			if (INVALID_SOCKET == _cSock)
 			{
 				cout << "错误，接收到无效的客户端！" << endl;
+			}
+			NewUserJoin userJoin;
+			userJoin.sock = _cSock;
+			for (auto _cSock : g_clients)
+			{
+				send(_cSock, (const char*)&userJoin, sizeof(NewUserJoin), 0);
 			}
 			g_clients.push_back(_cSock);
 			cout << "新客户端加入：socket = " << _cSock << "，"
