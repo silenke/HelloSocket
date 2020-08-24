@@ -1,9 +1,11 @@
-#define WIN32_LEAN_AND_MEAN
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 #ifdef _WIN32
+	#define WIN32_LEAN_AND_MEAN
+	#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 	#include <Windows.h>
 	#include <WinSock2.h>
+
+	#pragma comment(lib, "ws2_32.lib")
 #else
 	#include <unistd.h>
 	#include <arpa/inet.h>
@@ -16,8 +18,6 @@
 
 #include <iostream>
 #include <thread>
-
-#pragma comment(lib, "ws2_32.lib")
 
 using namespace std;
 
@@ -73,7 +73,7 @@ struct LogoutResult : public DataHeader
 		len = sizeof(LogoutResult);
 		result = 0;
 	}
-	int result;
+	SOCKET result;
 };
 
 struct NewUserJoin : public DataHeader
@@ -206,7 +206,7 @@ int main()
 #ifdef _WIN32
 	_sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 #else
-	_sin.sin_addr.s_addr = inet_addr("127.0.0.1");
+	_sin.sin_addr.s_addr = inet_addr("192.168.19.129");
 #endif
 	if (SOCKET_ERROR == connect(_sock, (sockaddr*)&_sin, sizeof(_sin))) {
 		cout << "错误，连接服务器失败！" << endl;
