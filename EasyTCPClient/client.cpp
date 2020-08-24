@@ -1,8 +1,19 @@
 #define WIN32_LEAN_AND_MEAN
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
-#include <Windows.h>
-#include <WinSock2.h>
+#ifdef _WIN32
+	#include <Windows.h>
+	#include <WinSock2.h>
+#else
+	#include <unistd.h>
+	#include <arpa/inet.h>
+	#include <string.h>
+
+	#define SOKCET unsigned long long
+	#define INVALID_SOCKET  (SOCKET)(~0)
+	#define SOCKET_ERROR            (-1)
+#endif
+
 #include <iostream>
 #include <thread>
 
@@ -175,11 +186,12 @@ void cmdThread(SOCKET _sock)
 
 int main()
 {
+#ifdef _WIN32
 	// 初始化套接字库
 	WORD version = MAKEWORD(2, 2);
 	WSADATA data;
 	WSAStartup(version, &data);
-
+#endif
 	// 创建套接字
 	SOCKET _sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (INVALID_SOCKET == _sock) {
@@ -191,7 +203,11 @@ int main()
 	sockaddr_in _sin = {};
 	_sin.sin_family = AF_INET;
 	_sin.sin_port = htons(6100);
+#ifdef _WIN32
 	_sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+#else
+	_sin.sin_addr.s_addr = inet_addr("127.0.0.1");
+#endif
 	if (SOCKET_ERROR == connect(_sock, (sockaddr*)&_sin, sizeof(_sin))) {
 		cout << "错误，连接服务器失败！" << endl;
 	}
@@ -223,11 +239,15 @@ int main()
 		}
 	}
 
+#ifdef _WIN32
 	// 关闭套接字
 	closesocket(_sock);
 
 	// 清理套接字库
 	WSACleanup();
+#else
+	close(_sock);
+#endif
 	cout << "已退出！" << endl;
 
 	return 0;
