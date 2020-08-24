@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <WinSock2.h>
 #include <iostream>
+#include <thread>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -130,6 +131,48 @@ int processor(SOCKET _cSock)
 	return 0;
 }
 
+bool g_bRun = true;
+
+void cmdThread(SOCKET _sock)
+{
+	while (true)
+	{
+		char cmdBuff[128]{};
+		cin >> cmdBuff;
+		if (!strcmp(cmdBuff, "exit")) {
+			g_bRun = false;
+			cout << "收到退出命令，结束任务！" << endl;
+			return;
+		}
+		else if (!strcmp(cmdBuff, "login")) {
+			// 发送数据
+			Login login;
+			strcpy_s(login.username, "Peppa Pig");
+			strcpy_s(login.password, "15213");
+			send(_sock, (const char*)&login, sizeof(Login), 0);
+
+			// 接收数据
+			LoginResult res{};
+			recv(_sock, (char*)&res, sizeof(LoginResult), 0);
+			cout << "LoginResult：" << res.result << endl;
+		}
+		else if (!strcmp(cmdBuff, "logout")) {
+			// 发送数据
+			Logout logout;
+			strcpy_s(logout.username, "Peppa Pig");
+			send(_sock, (const char*)&logout, sizeof(Logout), 0);
+
+			// 接收数据
+			LogoutResult res{};
+			recv(_sock, (char*)&res, sizeof(LogoutResult), 0);
+			cout << "LogoutResult：" << res.result << endl;
+		}
+		else {
+			cout << "不支持的命令，请重新输入！" << endl;
+		}
+	}
+}
+
 int main()
 {
 	// 初始化套接字库
@@ -154,7 +197,10 @@ int main()
 	}
 	cout << "连接服务器成功！" << endl;
 
-	while (true)
+	thread t1(cmdThread, _sock);
+	t1.detach();
+
+	while (g_bRun)
 	{
 		fd_set fdRead;
 		FD_ZERO(&fdRead);
@@ -175,39 +221,6 @@ int main()
 				break;
 			}
 		}
-
-		//char cmdBuff[128]{};
-		//cin >> cmdBuff;
-		//if (!strcmp(cmdBuff, "exit")) {
-		//	cout << "收到退出命令，结束任务！" << endl;
-		//	break;
-		//}
-		//else if (!strcmp(cmdBuff, "login")) {
-		//	// 发送数据
-		//	Login login;
-		//	strcpy_s(login.username, "Peppa Pig");
-		//	strcpy_s(login.password, "15213");
-		//	send(_sock, (const char*)&login, sizeof(Login), 0);
-
-		//	// 接收数据
-		//	LoginResult res{};
-		//	recv(_sock, (char*)&res, sizeof(LoginResult), 0);
-		//	cout << "LoginResult："  << res.result << endl;
-		//}
-		//else if (!strcmp(cmdBuff, "logout")) {
-		//	// 发送数据
-		//	Logout logout;
-		//	strcpy_s(logout.username, "Peppa Pig");
-		//	send(_sock, (const char*)&logout, sizeof(Logout), 0);
-
-		//	// 接收数据
-		//	LogoutResult res{};
-		//	recv(_sock, (char*)&res, sizeof(LogoutResult), 0);
-		//	cout << "LogoutResult：" << res.result << endl;
-		//}
-		//else {
-		//	cout << "不支持的命令，请重新输入！" << endl;
-		//}
 	}
 
 	// 关闭套接字
@@ -217,6 +230,5 @@ int main()
 	WSACleanup();
 	cout << "已退出！" << endl;
 
-	getchar();
 	return 0;
 }

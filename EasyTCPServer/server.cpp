@@ -235,6 +235,5 @@ int main()
 	WSACleanup();
 	cout << "ÒÑÍË³ö£¡" << endl;
 
-	getchar();
 	return 0;
 }
