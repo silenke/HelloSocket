@@ -57,16 +57,40 @@ int main()
 	EasyTCPClient client;
 	client.Connect("127.0.0.1", 6100);
 
+	EasyTCPClient client2;
+	client2.Connect("127.0.0.1", 6100);
+
+	EasyTCPClient client3;
+	client3.Connect("127.0.0.1", 6100);
+
 	// 启动UI线程
 	thread t1(cmdThread, &client);
 	t1.detach();
 
-	while (client.isRun())
+	thread t2(cmdThread, &client2);
+	t2.detach();
+
+	thread t3(cmdThread, &client3);
+	t3.detach();
+
+	Login login;
+	strcpy_s(login.username, "Peppa Pig");
+	strcpy_s(login.password, "15213");
+
+	while (client.isRun() || client2.isRun() || client3.isRun())
 	{
 		client.OnRun();
+		client2.OnRun();
+		client3.OnRun();
+
+		client.SendData(&login);
+		client2.SendData(&login);
+		client3.SendData(&login);
 	}
 
 	client.Close();
+	client2.Close();
+	client3.Close();
 	cout << "已退出！" << endl;
 
 	Sleep(10000);

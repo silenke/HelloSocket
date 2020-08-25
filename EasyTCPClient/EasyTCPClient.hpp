@@ -171,7 +171,6 @@ public:
 		case CMD_LOGIN_RESULT:
 		{
 			// 接收数据
-			
 			LoginResult* login = (LoginResult*)header;
 			cout << "<socket=" << _sock << ">收到命令：CMD_LOGIN_RESULT，"
 				<< "数据长度：" << header->len << endl;
