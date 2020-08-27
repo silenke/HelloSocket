@@ -146,8 +146,10 @@ public:
 		return INVALID_SOCKET != _sock;
 	}
 
-	// 缓冲区
+#ifndef RECV_BUFF_SIZE
 #define RECV_BUFF_SIZE 10240
+#endif // !RECV_BUFF_SIZE
+	// 缓冲区
 	char _szRecv[RECV_BUFF_SIZE]{};
 	char _szMsgBuf[RECV_BUFF_SIZE * 10]{};
 	int _lastPos = 0;
@@ -157,7 +159,7 @@ public:
 	{
 		// 接收数据
 		int nLen = recv(_sock, _szRecv, RECV_BUFF_SIZE, 0);
-		cout << "nLen = " << nLen <<  endl;
+		//cout << "nLen = " << nLen <<  endl;
 		if (nLen <= 0) {
 			cout << "<socket=" << _sock << ">与服务器断开连接，结束任务！" << endl;
 			return -1;
@@ -189,30 +191,30 @@ public:
 		{
 			// 接收数据
 			LoginResult* login = (LoginResult*)header;
-			cout << "<socket=" << _sock << ">收到命令：CMD_LOGIN_RESULT，"
-				<< "数据长度：" << header->len << endl;
+			//cout << "<socket=" << _sock << ">收到命令：CMD_LOGIN_RESULT，"
+			//	<< "数据长度：" << header->len << endl;
 		}
 		break;
 		case CMD_LOGOUT_RESULT:
 		{
 			// 接收数据
 			LogoutResult* logout = (LogoutResult*)header;
-			cout << "<socket=" << _sock << ">收到命令：CMD_LOGOUT_RESULT，"
-				<< "数据长度：" << header->len << endl;
+			//cout << "<socket=" << _sock << ">收到命令：CMD_LOGOUT_RESULT，"
+			//	<< "数据长度：" << header->len << endl;
 		}
 		break;
 		case CMD_NEW_USER_JOIN:
 		{
 			// 接收数据
 			NewUserJoin* userJoin = (NewUserJoin*)header;
-			cout << "<socket=" << _sock << ">收到命令：CMD_NEW_USER_JOIN，"
-				<< "数据长度：" << header->len << endl;
+			//cout << "<socket=" << _sock << ">收到命令：CMD_NEW_USER_JOIN，"
+			//	<< "数据长度：" << header->len << endl;
 		}
 		break;
 		case CMD_ERROR:
 		{
-			cout << "<socket=" << _sock << ">收到命令：CMD_ERROR，"
-				<< "数据长度：" << header->len << endl;
+			//cout << "<socket=" << _sock << ">收到命令：CMD_ERROR，"
+			//	<< "数据长度：" << header->len << endl;
 		}
 		break;
 		default:

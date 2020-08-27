@@ -13,6 +13,10 @@ enum CMD
 
 struct DataHeader
 {
+	DataHeader() {
+		cmd = CMD_ERROR;
+		len = sizeof(DataHeader);
+	}
 	short cmd;
 	short len;
 };
@@ -25,6 +29,7 @@ struct Login : public DataHeader
 	}
 	char username[32];
 	char password[32];
+	char data[956];
 };
 
 struct LoginResult : public DataHeader
@@ -35,7 +40,7 @@ struct LoginResult : public DataHeader
 		result = 0;
 	}
 	int result;
-	char data[1024];
+	char data[1016];
 };
 
 struct Logout : public DataHeader
@@ -54,16 +59,16 @@ struct LogoutResult : public DataHeader
 		len = sizeof(LogoutResult);
 		result = 0;
 	}
-	SOCKET result;
+	int result;
 };
 
 struct NewUserJoin : public DataHeader
 {
 	NewUserJoin() {
 		cmd = CMD_NEW_USER_JOIN;
-		len = sizeof(CMD_NEW_USER_JOIN);
+		len = sizeof(NewUserJoin);
 	}
-	int sock;
+	SOCKET sock;
 };
 
 #endif // !_MessageHeader_hpp_
