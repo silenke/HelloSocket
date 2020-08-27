@@ -55,7 +55,7 @@ void cmdThread()
 
 int main()
 {
-	const int cCount = 63;
+	const int cCount = FD_SETSIZE - 1;
 	EasyTCPClient* clients = new EasyTCPClient[cCount];
 	for (int i = 0; i < cCount; i++) {
 		clients[i].Connect("127.0.0.1", 6100);
