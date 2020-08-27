@@ -22,30 +22,31 @@
 
 using namespace std;
 
-void cmdThread(EasyTCPClient* client)
+bool g_bRun = true;
+void cmdThread()
 {
 	while (true)
 	{
 		char cmdBuff[128]{};
 		cin >> cmdBuff;
 		if (!strcmp(cmdBuff, "exit")) {
-			client->Close();
+			g_bRun = false;
 			cout << "收到退出命令，结束任务！" << endl;
 			return;
 		}
-		else if (!strcmp(cmdBuff, "login")) {
-			// 发送数据
-			Login login;
-			strcpy_s(login.username, "Peppa Pig");
-			strcpy_s(login.password, "15213");
-			client->SendData(&login);
-		}
-		else if (!strcmp(cmdBuff, "logout")) {
-			// 发送数据
-			Logout logout;
-			strcpy_s(logout.username, "Peppa Pig");
-			client->SendData(&logout);
-		}
+		//else if (!strcmp(cmdBuff, "login")) {
+		//	// 发送数据
+		//	Login login;
+		//	strcpy_s(login.username, "Peppa Pig");
+		//	strcpy_s(login.password, "15213");
+		//	client->SendData(&login);
+		//}
+		//else if (!strcmp(cmdBuff, "logout")) {
+		//	// 发送数据
+		//	Logout logout;
+		//	strcpy_s(logout.username, "Peppa Pig");
+		//	client->SendData(&logout);
+		//}
 		else {
 			cout << "不支持的命令，请重新输入！" << endl;
 		}
@@ -54,24 +55,32 @@ void cmdThread(EasyTCPClient* client)
 
 int main()
 {
-	EasyTCPClient client;
-	client.Connect("127.0.0.1", 6100);
+	const int cCount = 63;
+	EasyTCPClient* clients = new EasyTCPClient[cCount];
+	for (int i = 0; i < cCount; i++) {
+		clients[i].Connect("127.0.0.1", 6100);
+	}
 
 	// 启动UI线程
-	thread t1(cmdThread, &client);
+	thread t1(cmdThread);
 	t1.detach();
 
 	Login login;
 	strcpy_s(login.username, "Peppa Pig");
 	strcpy_s(login.password, "15213");
 	
-	while (client.isRun())
+	while (g_bRun)
 	{
-		client.OnRun();
-		client.SendData(&login);
+		for (int i = 0; i < cCount; i++) {
+			clients[i].SendData(&login);
+			clients[i].OnRun();
+		}
 	}
 
-	client.Close();
+	for (int i = 0; i < cCount; i++) {
+		clients[i].Close();
+	}
+	delete[] clients;
 	cout << "已退出！" << endl;
 
 	Sleep(10000);
