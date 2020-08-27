@@ -1,7 +1,26 @@
 #include <iostream>
+#include <thread>
 #include "EasyTCPServer.hpp"
 
 using namespace std;
+
+bool g_bRun = true;
+void cmdThread()
+{
+	while (true)
+	{
+		char cmdBuff[128]{};
+		cin >> cmdBuff;
+		if (!strcmp(cmdBuff, "exit")) {
+			g_bRun = false;
+			cout << "收到退出命令，结束任务！" << endl;
+			return;
+		}
+		else {
+			cout << "不支持的命令，请重新输入！" << endl;
+		}
+	}
+}
 
 int main()
 {
@@ -10,7 +29,11 @@ int main()
 	server.Bind(nullptr, 6100);
 	server.Listen(5);
 
-	while (server.isRun())
+	// 启动UI线程
+	thread t1(cmdThread);
+	t1.detach();
+
+	while (g_bRun)
 	{
 		server.OnRun();
 	}

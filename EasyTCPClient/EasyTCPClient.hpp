@@ -135,6 +135,7 @@ public:
 			if (-1 == RecvData())
 			{
 				cout << "<socket=" << _sock << ">selectÈÎÎñ½áÊø2£¡" << endl;
+				Close();
 				return false;
 			}
 		}
