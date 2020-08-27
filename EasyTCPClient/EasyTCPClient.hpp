@@ -109,6 +109,7 @@ public:
 	}
 
 	// 查询网络消息
+	//int _nCount = 0;
 	bool OnRun()
 	{
 		if (!isRun())
@@ -122,6 +123,7 @@ public:
 
 		timeval t{};
 		int ret = select(_sock + 1, &fdRead, NULL, NULL, &t);
+		//cout << "select ret = " << ret << "，count = " << _nCount++ << endl;
 		if (ret < 0)
 		{
 			cout << "<socket=" << _sock << ">select任务结束1！" << endl;
@@ -144,21 +146,36 @@ public:
 		return INVALID_SOCKET != _sock;
 	}
 
+	// 缓冲区
+#define RECV_BUFF_SIZE 10240
+	char _szRecv[RECV_BUFF_SIZE]{};
+	char _szMsgBuf[RECV_BUFF_SIZE * 10]{};
+	int _lastPos = 0;
+
 	// 接收数据
 	int RecvData()
 	{
 		// 接收数据
-		char szRecv[1024]{};
-		int nLen = recv(_sock, szRecv, sizeof(DataHeader), 0);
+		int nLen = recv(_sock, _szRecv, RECV_BUFF_SIZE, 0);
+		cout << "nLen = " << nLen <<  endl;
 		if (nLen <= 0) {
 			cout << "<socket=" << _sock << ">与服务器断开连接，结束任务！" << endl;
 			return -1;
 		}
-		// if (nLen >= sizeof(DataHeader)) 可能少包
-		DataHeader* header = (DataHeader*)szRecv;
-		recv(_sock, szRecv + sizeof(DataHeader), header->len - sizeof(DataHeader), 0);
-
-		OnNetMsg(header);
+		memcpy(_szMsgBuf + _lastPos, _szRecv, nLen);
+		_lastPos += nLen;
+		while (_lastPos >= sizeof(DataHeader))
+		{
+			DataHeader* header = (DataHeader*)_szMsgBuf;
+			if (_lastPos >= header->len)
+			{
+				int nSize = _lastPos - header->len;
+				OnNetMsg(header);
+				memcpy(_szMsgBuf, _szMsgBuf + header->len, nSize);
+				_lastPos = nSize;
+			}
+			else break;
+		}
 
 		return 0;
 	}
