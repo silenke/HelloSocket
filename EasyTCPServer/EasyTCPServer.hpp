@@ -24,6 +24,7 @@
 #include <iostream>
 #include <vector>
 #include "MessageHeader.hpp"
+#include "CELLTimestamp.hpp"
 
 #ifndef RECV_BUFF_SIZE
 #define RECV_BUFF_SIZE 10240
@@ -71,6 +72,7 @@ public:
 	EasyTCPServer()
 	{
 		_sock = INVALID_SOCKET;
+		_recvCount = 0;
 	}
 
 	virtual ~EasyTCPServer()
@@ -303,6 +305,16 @@ public:
 	// ÏìÓ¦ÍøÂçÏûÏ¢
 	virtual void OnNetMsg(SOCKET cSock, DataHeader* header)
 	{
+		_recvCount++;
+		auto t1 = _tTime.getElapsedSecond();
+		if (t1 >= 1.0)
+		{
+			cout << "time<" << t1 << ">£¬socket<" << _sock
+				<< ">£¬recvCount<" << _recvCount << ">" << endl;
+			_tTime.update();
+			_recvCount = 0;
+		}
+
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
@@ -360,6 +372,8 @@ public:
 private:
 	SOCKET _sock;
 	vector<ClientSocket*> _clients;
+	CELLTimestamp _tTime;
+	int _recvCount;
 };
 
 #endif // !_EasyTCPServer_hpp_
