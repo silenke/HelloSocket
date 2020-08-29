@@ -50,14 +50,14 @@ public:
 		if (INVALID_SOCKET != _sock)
 		{
 			Close();
-			cout << "<socket=" << _sock << ">关闭旧连接" << endl;
+			//cout << "<socket=" << _sock << ">关闭旧连接" << endl;
 		}
 
 		_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (INVALID_SOCKET == _sock) {
 			cout << "错误，创建套接字失败！" << endl;
 		}
-		cout << "<socket=" << _sock << ">创建套接字成功！" << endl;
+		//cout << "<socket=" << _sock << ">创建套接字成功！" << endl;
 	}
 
 	// 连接服务器
@@ -82,8 +82,8 @@ public:
 			cout << "<socket=" << _sock << ">错误，连接服务器<"
 				<< ip << ":" << port << ">失败！" << endl;
 		}
-		cout << "<socket=" << _sock << ">连接服务器<"
-			<< ip << ":" << port << ">成功！" << endl;
+		//cout << "<socket=" << _sock << ">连接服务器<"
+		//	<< ip << ":" << port << ">成功！" << endl;
 
 		return ret;
 	}

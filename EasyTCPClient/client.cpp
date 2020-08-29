@@ -53,36 +53,66 @@ void cmdThread()
 	}
 }
 
-int main()
-{
-	const int cCount = 1000;
-	EasyTCPClient* clients = new EasyTCPClient[cCount];
-	for (int i = 0; i < cCount; i++) {
-		clients[i].Connect("127.0.0.1", 6100);
-	}
+const int cCount = 1000;
+const int tCount = 4;
+EasyTCPClient* clients[cCount];
 
-	// 启动UI线程
-	thread t1(cmdThread);
-	t1.detach();
+void sendThread(int id)
+{
+	int c = cCount / tCount;
+	int begin = id * c;
+	int end = id * c + c;
+	for (int i = begin; i < end; i++)
+	{
+		if (!g_bRun)
+		{
+			for (int j = begin; j < i; j++)
+			{
+				clients[j]->Close();
+				delete clients[j];
+			}
+			return;
+		}
+		clients[i] = new EasyTCPClient();
+		clients[i]->Connect("127.0.0.1", 6100);
+		cout << "Connect=" << i << endl;
+	}
 
 	Login login;
 	strcpy_s(login.username, "Peppa Pig");
 	strcpy_s(login.password, "15213");
-	
+
 	while (g_bRun)
 	{
-		for (int i = 0; i < cCount; i++) {
-			clients[i].SendData(&login);
-			clients[i].OnRun();
+		for (int i = begin; i < end; i++)
+		{
+			clients[i]->SendData(&login);
+			clients[i]->OnRun();
 		}
 	}
 
-	for (int i = 0; i < cCount; i++) {
-		clients[i].Close();
+	for (int i = begin; i < end; i++)
+	{
+		clients[i]->Close();
+		delete clients[i];
 	}
-	delete[] clients;
+}
+
+int main()
+{
+	// 启动UI线程
+	thread t1(cmdThread);
+	t1.detach();
+
+	// 启动发送线程
+	for (int i = 0; i < tCount; i++)
+	{
+		thread t1(sendThread, i);
+		t1.detach();
+	}
+
 	cout << "已退出！" << endl;
 
-	Sleep(10000);
+	Sleep(1000000);
 	return 0;
 }
