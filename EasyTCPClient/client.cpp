@@ -20,18 +20,16 @@
 #include <thread>
 #include "EasyTCPClient.hpp"
 
-using namespace std;
-
 bool g_bRun = true;
 void cmdThread()
 {
 	while (true)
 	{
 		char cmdBuff[128]{};
-		cin >> cmdBuff;
+		std::cin >> cmdBuff;
 		if (!strcmp(cmdBuff, "exit")) {
 			g_bRun = false;
-			cout << "收到退出命令，结束任务！" << endl;
+			std::cout << "收到退出命令，结束任务！" << std::endl;
 			return;
 		}
 		//else if (!strcmp(cmdBuff, "login")) {
@@ -48,7 +46,7 @@ void cmdThread()
 		//	client->SendData(&logout);
 		//}
 		else {
-			cout << "不支持的命令，请重新输入！" << endl;
+			std::cout << "不支持的命令，请重新输入！" << std::endl;
 		}
 	}
 }
@@ -75,7 +73,7 @@ void sendThread(int id)
 		}
 		clients[i] = new EasyTCPClient();
 		clients[i]->Connect("127.0.0.1", 6100);
-		cout << "Connect=" << i << endl;
+		std::cout << "Connect=" << i << std::endl;
 	}
 
 	Login login;
@@ -101,17 +99,17 @@ void sendThread(int id)
 int main()
 {
 	// 启动UI线程
-	thread t1(cmdThread);
+	std::thread t1(cmdThread);
 	t1.detach();
 
 	// 启动发送线程
 	for (int i = 0; i < tCount; i++)
 	{
-		thread t1(sendThread, i);
+		std::thread t1(sendThread, i);
 		t1.detach();
 	}
 
-	cout << "已退出！" << endl;
+	std::cout << "已退出！" << std::endl;
 
 	Sleep(1000000);
 	return 0;

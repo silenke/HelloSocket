@@ -22,8 +22,6 @@
 #include <iostream>
 #include "MessageHeader.hpp"
 
-using namespace std;
-
 class EasyTCPClient
 {
 public:
@@ -50,14 +48,14 @@ public:
 		if (INVALID_SOCKET != _sock)
 		{
 			Close();
-			//cout << "<socket=" << _sock << ">关闭旧连接" << endl;
+			//std::cout << "<socket=" << _sock << ">关闭旧连接" << std::endl;
 		}
 
 		_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (INVALID_SOCKET == _sock) {
-			cout << "错误，创建套接字失败！" << endl;
+			std::cout << "错误，创建套接字失败！" << std::endl;
 		}
-		//cout << "<socket=" << _sock << ">创建套接字成功！" << endl;
+		//std::cout << "<socket=" << _sock << ">创建套接字成功！" << std::endl;
 	}
 
 	// 连接服务器
@@ -79,11 +77,11 @@ public:
 #endif
 		int ret = connect(_sock, (sockaddr*)&_sin, sizeof(_sin));
 		if (SOCKET_ERROR == ret) {
-			cout << "<socket=" << _sock << ">错误，连接服务器<"
-				<< ip << ":" << port << ">失败！" << endl;
+			std::cout << "<socket=" << _sock << ">错误，连接服务器<"
+				<< ip << ":" << port << ">失败！" << std::endl;
 		}
-		//cout << "<socket=" << _sock << ">连接服务器<"
-		//	<< ip << ":" << port << ">成功！" << endl;
+		//std::cout << "<socket=" << _sock << ">连接服务器<"
+		//	<< ip << ":" << port << ">成功！" << std::endl;
 
 		return ret;
 	}
@@ -123,10 +121,10 @@ public:
 
 		timeval t{};
 		int ret = select(_sock + 1, &fdRead, NULL, NULL, &t);
-		//cout << "select ret = " << ret << "，count = " << _nCount++ << endl;
+		//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
 		if (ret < 0)
 		{
-			cout << "<socket=" << _sock << ">select任务结束1！" << endl;
+			std::cout << "<socket=" << _sock << ">select任务结束1！" << std::endl;
 			return false;
 		}
 		if (FD_ISSET(_sock, &fdRead))
@@ -134,7 +132,7 @@ public:
 			FD_CLR(_sock, &fdRead);
 			if (-1 == RecvData())
 			{
-				cout << "<socket=" << _sock << ">select任务结束2！" << endl;
+				std::cout << "<socket=" << _sock << ">select任务结束2！" << std::endl;
 				Close();
 				return false;
 			}
@@ -160,9 +158,9 @@ public:
 	{
 		// 接收数据
 		int nLen = recv(_sock, _szRecv, RECV_BUFF_SIZE, 0);
-		//cout << "nLen = " << nLen <<  endl;
+		//std::cout << "nLen = " << nLen <<  std::endl;
 		if (nLen <= 0) {
-			cout << "<socket=" << _sock << ">与服务器断开连接，结束任务！" << endl;
+			std::cout << "<socket=" << _sock << ">与服务器断开连接，结束任务！" << std::endl;
 			return -1;
 		}
 		memcpy(_szMsgBuf + _lastPos, _szRecv, nLen);
@@ -192,36 +190,36 @@ public:
 		{
 			// 接收数据
 			LoginResult* login = (LoginResult*)header;
-			//cout << "<socket=" << _sock << ">收到命令：CMD_LOGIN_RESULT，"
-			//	<< "数据长度：" << header->len << endl;
+			//std::cout << "<socket=" << _sock << ">收到命令：CMD_LOGIN_RESULT，"
+			//	<< "数据长度：" << header->len << std::endl;
 		}
 		break;
 		case CMD_LOGOUT_RESULT:
 		{
 			// 接收数据
 			LogoutResult* logout = (LogoutResult*)header;
-			//cout << "<socket=" << _sock << ">收到命令：CMD_LOGOUT_RESULT，"
-			//	<< "数据长度：" << header->len << endl;
+			//std::cout << "<socket=" << _sock << ">收到命令：CMD_LOGOUT_RESULT，"
+			//	<< "数据长度：" << header->len << std::endl;
 		}
 		break;
 		case CMD_NEW_USER_JOIN:
 		{
 			// 接收数据
 			NewUserJoin* userJoin = (NewUserJoin*)header;
-			//cout << "<socket=" << _sock << ">收到命令：CMD_NEW_USER_JOIN，"
-			//	<< "数据长度：" << header->len << endl;
+			//std::cout << "<socket=" << _sock << ">收到命令：CMD_NEW_USER_JOIN，"
+			//	<< "数据长度：" << header->len << std::endl;
 		}
 		break;
 		case CMD_ERROR:
 		{
-			//cout << "<socket=" << _sock << ">收到命令：CMD_ERROR，"
-			//	<< "数据长度：" << header->len << endl;
+			//std::cout << "<socket=" << _sock << ">收到命令：CMD_ERROR，"
+			//	<< "数据长度：" << header->len << std::endl;
 		}
 		break;
 		default:
 		{
-			cout << "<socket=" << _sock << ">收到未知命令，"
-				<< "数据长度：" << header->len << endl;
+			std::cout << "<socket=" << _sock << ">收到未知命令，"
+				<< "数据长度：" << header->len << std::endl;
 		}
 		break;
 		}
