@@ -80,6 +80,7 @@ public:
 			std::cout << "<socket=" << _sock << ">错误，连接服务器<"
 				<< ip << ":" << port << ">失败！" << std::endl;
 		}
+		//std::cout << "<socket=" << _sock << ">connect" << std::endl;
 		//std::cout << "<socket=" << _sock << ">连接服务器<"
 		//	<< ip << ":" << port << ">成功！" << std::endl;
 
