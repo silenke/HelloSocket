@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include <thread>
 #include <mutex>
 #include <functional>
@@ -125,16 +126,16 @@ public:
 
 #ifdef _WIN32
 		// 关闭套接字
-		for (auto cSock : _clients)
+		for (auto p : _clients)
 		{
-			closesocket(cSock->sockfd());
-			delete cSock;
+			closesocket(p.first);
+			delete p.second;
 		}
 #else
-		for (auto cSock : _clients)
+		for (auto p : _clients)
 		{
-			close(cSock->sockfd());
-			delete cSock;
+			close(p.first);
+			delete p.second;
 		}
 #endif
 		_clients.clear();
@@ -154,7 +155,7 @@ public:
 				std::lock_guard<std::mutex> lock(_mutex);
 				for (auto pClient : _clientsBuff)
 				{
-					_clients.push_back(pClient);
+					_clients[pClient->sockfd()] = pClient;
 				}
 				_clientsBuff.clear();
 				_clients_changed = true;
@@ -174,11 +175,11 @@ public:
 			if (_clients_changed)
 			{
 				_clients_changed = false;
-				_maxSock = _clients[0]->sockfd();
-				for (auto cSock : _clients)
+				_maxSock = _clients.begin()->first;
+				for (auto p : _clients)
 				{
-					FD_SET(cSock->sockfd(), &fdRead);
-					_maxSock = max(_maxSock, cSock->sockfd());
+					FD_SET(p.first, &fdRead);
+					_maxSock = max(_maxSock, p.first);
 				}
 				memcpy(&_fdRead_bak, &fdRead, sizeof(fd_set));
 			}
@@ -187,33 +188,44 @@ public:
 				memcpy(&fdRead, &_fdRead_bak, sizeof(fd_set));
 			}
 
-			int ret = select(_maxSock + 1, &fdRead, nullptr, nullptr, nullptr);
+			//timeval t{ 0, 0 };
+			int ret = select(_maxSock + 1, &fdRead, nullptr, nullptr,nullptr);
 			//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
 			if (ret < 0)
 			{
 				std::cout << "select任务结束！" << std::endl;
 				return false;
 			}
-#ifdef _WIN32x
+			//else if (ret == 0)
+			//{
+			//	continue;
+			//}
+
+#ifdef _WIN32
 			for (int i = 0; i < fdRead.fd_count; i++)
 			{
-				if (-1 == RecvData(fdRead.fd_array[i]))
+				auto pClient = _clients[fdRead.fd_array[i]];
+				if (-1 == RecvData(pClient))
 				{
-					auto it = find(_clients.begin(), _clients.end(), fdRead.fd_array[i]);
-					if (it != _clients.end()) _clients.erase(it);
+					if (_pNetEvent)
+						_pNetEvent->OnNetLeave(pClient);
+					delete pClient;
+					_clients.erase(fdRead.fd_array[i]);
+					_clients_changed = true;
 				}
 			}
 #else
-			for (int i = _clients.size() - 1; i >= 0; i--)
+			for (auto p : _clients)
 			{
-				if (FD_ISSET(_clients[i]->sockfd(), &fdRead))
+				if (FD_ISSET(p.first, &fdRead))
 				{
-					if (-1 == RecvData(_clients[i]))
+					if (-1 == RecvData(p.second))
 					{
 						if (_pNetEvent)
-							_pNetEvent->OnNetLeave(_clients[i]);
-						delete _clients[i];
-						_clients.erase(_clients.begin() + i);
+							_pNetEvent->OnNetLeave(p.second);
+						delete p.second;
+						_clients.erase(p.first);
+						_clients_changed = true;
 					}
 				}
 			}
@@ -295,7 +307,7 @@ public:
 
 private:
 	SOCKET _sock;
-	std::vector<ClientSocket*> _clients;		// 正式客户队列
+	std::unordered_map<SOCKET, ClientSocket*> _clients;	// 正式客户队列
 	std::vector<ClientSocket*> _clientsBuff;	// 缓冲客户队列
 	std::mutex _mutex;	// 缓冲队列的锁
 	std::thread _thread;

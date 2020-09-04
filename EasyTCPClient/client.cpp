@@ -77,8 +77,7 @@ void sendThread(int id)
 	}
 
 	std::cout << "thread<" << id
-		<< ">£¬Connect<begin=" << begin
-		<< "£¬end=" << end - 1 << ">" << std::endl;
+		<< ">£¬Connect<begin=" << begin << "£¬end=" << end << ">" << std::endl;
 
 	//std::chrono::milliseconds t(3000);
 	//std::this_thread::sleep_for(t);
