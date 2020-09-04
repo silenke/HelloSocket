@@ -141,8 +141,12 @@ public:
 	}
 
 	// 处理网络消息
+	fd_set _fdRead_bak;
+	bool _clients_changed;
+	SOCKET _maxSock;
 	bool OnRun()
 	{
+		_clients_changed = true;
 		while (isRun())
 		{
 			if (!_clientsBuff.empty())
@@ -153,6 +157,7 @@ public:
 					_clients.push_back(pClient);
 				}
 				_clientsBuff.clear();
+				_clients_changed = true;
 			}
 
 			if (_clients.empty())
@@ -166,14 +171,23 @@ public:
 
 			FD_ZERO(&fdRead);
 
-			SOCKET maxSock = _clients[0]->sockfd();
-			for (auto cSock : _clients)
+			if (_clients_changed)
 			{
-				FD_SET(cSock->sockfd(), &fdRead);
-				maxSock = max(maxSock, cSock->sockfd());
+				_clients_changed = false;
+				_maxSock = _clients[0]->sockfd();
+				for (auto cSock : _clients)
+				{
+					FD_SET(cSock->sockfd(), &fdRead);
+					_maxSock = max(_maxSock, cSock->sockfd());
+				}
+				memcpy(&_fdRead_bak, &fdRead, sizeof(fd_set));
+			}
+			else
+			{
+				memcpy(&fdRead, &_fdRead_bak, sizeof(fd_set));
 			}
 
-			int ret = select(maxSock + 1, &fdRead, nullptr, nullptr, nullptr);
+			int ret = select(_maxSock + 1, &fdRead, nullptr, nullptr, nullptr);
 			//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
 			if (ret < 0)
 			{
@@ -181,7 +195,7 @@ public:
 				return false;
 			}
 #ifdef _WIN32x
-			for (unsigned int i = 0; i < fdRead.fd_count; i++)
+			for (int i = 0; i < fdRead.fd_count; i++)
 			{
 				if (-1 == RecvData(fdRead.fd_array[i]))
 				{
@@ -203,7 +217,7 @@ public:
 					}
 				}
 			}
-#endif
+#endif	// _WIN32
 		}
 
 		return true;
