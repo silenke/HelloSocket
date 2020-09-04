@@ -28,6 +28,7 @@ public:
 	EasyTCPClient()
 	{
 		_sock = INVALID_SOCKET;
+		isConnected = false;
 	}
 
 	virtual ~EasyTCPClient()
@@ -80,6 +81,9 @@ public:
 			std::cout << "<socket=" << _sock << ">错误，连接服务器<"
 				<< ip << ":" << port << ">失败！" << std::endl;
 		}
+		else {
+			isConnected = true;
+		}
 		//std::cout << "<socket=" << _sock << ">connect" << std::endl;
 		//std::cout << "<socket=" << _sock << ">连接服务器<"
 		//	<< ip << ":" << port << ">成功！" << std::endl;
@@ -105,6 +109,7 @@ public:
 		close(_sock);
 #endif
 		_sock = INVALID_SOCKET;
+		isConnected = false;
 	}
 
 	// 查询网络消息
@@ -143,7 +148,7 @@ public:
 
 	bool isRun()
 	{
-		return INVALID_SOCKET != _sock;
+		return INVALID_SOCKET != _sock && isConnected;
 	}
 
 #ifndef RECV_BUFF_SIZE
@@ -229,15 +234,21 @@ public:
 	// 发送消息
 	int SendData(DataHeader* header)
 	{
+		int ret = SOCKET_ERROR;
 		if (isRun() && header)
 		{
-			return send(_sock, (const char*)header, header->len, 0);
+			ret = send(_sock, (const char*)header, header->len, 0);
+			if (SOCKET_ERROR == ret)
+			{
+				Close();
+			}
 		}
-		return SOCKET_ERROR;
+		return ret;
 	}
 
 private:
 	SOCKET _sock;
+	bool isConnected;
 };
 
 #endif // _EasyTCPClient_hpp_

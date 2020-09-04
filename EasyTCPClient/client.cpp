@@ -73,11 +73,15 @@ void sendThread(int id)
 		}
 		clients[i] = new EasyTCPClient();
 		clients[i]->Connect("127.0.0.1", 6100);
-		std::cout << "thread<" << id << ">£¬Connect=" << i << std::endl;
+		//std::cout << "thread<" << id << ">£¬Connect=" << i << std::endl;
 	}
 
-	std::chrono::milliseconds t(3000);
-	std::this_thread::sleep_for(t);
+	std::cout << "thread<" << id
+		<< ">£¬Connect<begin=" << begin
+		<< "£¬end=" << end - 1 << ">" << std::endl;
+
+	//std::chrono::milliseconds t(3000);
+	//std::this_thread::sleep_for(t);
 
 	Login login;
 	strcpy_s(login.username, "Peppa Pig");
