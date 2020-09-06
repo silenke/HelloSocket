@@ -142,6 +142,7 @@
     <ClCompile Include="client.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CELLTimestamp.hpp" />
     <ClInclude Include="EasyTCPClient.hpp" />
     <ClInclude Include="MessageHeader.hpp" />
   </ItemGroup>

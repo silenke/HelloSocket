@@ -91,6 +91,8 @@ public:
 	virtual void OnNetLeave(ClientSocket* pClient) = 0;
 	// 客户端消息事件
 	virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header) = 0;
+	// recv事件
+	virtual void OnNetRecv(ClientSocket* pClient) = 0;
 
 private:
 
@@ -248,6 +250,7 @@ public:
 	{
 		// 接收数据
 		int nLen = recv(pClient->sockfd(), szRecv, RECV_BUFF_SIZE, 0);
+		_pNetEvent->OnNetRecv(pClient);
 		//std::cout << "nLen = " << nLen << std::endl;
 		if (nLen <= 0) {
 			//std::cout << "<socket=" << _sock << ">已退出，结束任务！" << std::endl;
@@ -321,6 +324,7 @@ public:
 	EasyTCPServer()
 	{
 		_sock = INVALID_SOCKET;
+		_msgCount = 0;
 		_recvCount = 0;
 		_clientCount = 0;
 	}
@@ -512,9 +516,13 @@ public:
 		if (t1 >= 1.0)
 		{
 			std::cout << "thread<" << _cellServers.size()
-				<< ">，time<" << t1 << ">，socket<" << _sock
-				<< ">，number<" << _clientCount
-				<< ">，recvCount<" << (int)(_recvCount / t1) << ">" << std::endl;
+				<< ">，time<" << t1
+				<< ">，socket<" << _sock
+				<< ">，clients<" << _clientCount
+				<< ">，recv<" << (int)(_recvCount / t1)
+				<< ">，msg<" << (int)(_msgCount / t1)
+				<< ">" << std::endl;
+			_msgCount = 0;
 			_recvCount = 0;
 			_tTime.update();
 		}
@@ -550,8 +558,9 @@ private:
 	CELLTimestamp _tTime;	// 每秒消息计时
 
 protected:
-	std::atomic_int _recvCount;	// 收到消息计数
+	std::atomic_int _msgCount;	// 收到消息计数
 	std::atomic_int _clientCount;	// 客户端加入计数
+	std::atomic_int _recvCount;	// 收到recv计数
 };
 
 #endif // !_EasyTCPServer_hpp_

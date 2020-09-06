@@ -39,7 +39,7 @@ class MyServer : public EasyTCPServer
 	// 被多个线程触发，不安全
 	void OnNetMsg(ClientSocket* pClient, DataHeader* header)
 	{
-		_recvCount++;
+		_msgCount++;
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
@@ -76,6 +76,12 @@ class MyServer : public EasyTCPServer
 		}
 		break;
 		}
+	}
+
+	// recv事件
+	void OnNetRecv(ClientSocket* pClient)
+	{
+		_recvCount++;
 	}
 };
 

@@ -19,6 +19,7 @@
 #include <iostream>
 #include <thread>
 #include "EasyTCPClient.hpp"
+#include "CELLTimestamp.hpp"
 
 bool g_bRun = true;
 void cmdThread()
@@ -51,9 +52,11 @@ void cmdThread()
 	}
 }
 
-const int cCount = 1000;
+const int cCount = 100;
 const int tCount = 4;
 EasyTCPClient* clients[cCount];
+std::atomic_int sendCount = 0;
+std::atomic_int readCount = 0;
 
 void sendThread(int id)
 {
@@ -79,8 +82,12 @@ void sendThread(int id)
 	std::cout << "thread<" << id
 		<< ">，Connect<begin=" << begin << "，end=" << end << ">" << std::endl;
 
-	//std::chrono::milliseconds t(3000);
-	//std::this_thread::sleep_for(t);
+	readCount++;
+	while (readCount < tCount)	// 等待其他线程
+	{
+		std::chrono::milliseconds t(10);
+		std::this_thread::sleep_for(t);
+	}
 
 	Login login;
 	strcpy_s(login.username, "Peppa Pig");
@@ -90,7 +97,10 @@ void sendThread(int id)
 	{
 		for (int i = begin; i < end; i++)
 		{
-			clients[i]->SendData(&login);
+			if (SOCKET_ERROR != clients[i]->SendData(&login))
+			{
+				sendCount++;
+			}
 			clients[i]->OnRun();
 		}
 	}
@@ -115,8 +125,24 @@ int main()
 		t1.detach();
 	}
 
+	CELLTimestamp tTime;
+	while (g_bRun)
+	{
+		auto t = tTime.getElapsedSecond();
+		if (t >= 1.0)
+		{
+			std::cout << "thread<" << tCount
+				<< ">，time<" << t
+				<< ">，clients<" << cCount
+				<< ">，send<" << sendCount
+				<< ">" << std::endl;
+			sendCount = 0;
+			tTime.update();
+		}
+		Sleep(1);
+	}
+
 	std::cout << "已退出！" << std::endl;
 
-	Sleep(1000000);
 	return 0;
 }
