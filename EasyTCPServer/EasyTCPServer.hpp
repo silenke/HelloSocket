@@ -31,6 +31,7 @@
 #include <atomic>
 #include "MessageHeader.hpp"
 #include "CELLTimestamp.hpp"
+#include "CELLTask.hpp"
 
 #ifndef RECV_BUFF_SIZE
 #define RECV_BUFF_SIZE 10240
@@ -101,6 +102,7 @@ private:
 	int _lastSendPos = 0;
 };
 
+class CellServer;
 // 网络事件接口
 class INetEvent
 {
@@ -110,15 +112,32 @@ public:
 	// 客户端离开事件
 	virtual void OnNetLeave(ClientSocket* pClient) = 0;
 	// 客户端消息事件
-	virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header) = 0;
+	virtual void OnNetMsg(CellServer* pCellServer, ClientSocket* pClient, DataHeader* header) = 0;
 	// recv事件
 	virtual void OnNetRecv(ClientSocket* pClient) = 0;
-
-private:
-
 };
 
 
+// 网络消息发送任务
+class CellSendMsg2ClientTask : public CellTask
+{
+public:
+	CellSendMsg2ClientTask(ClientSocket* pClient, DataHeader* header)
+		: _pClient(pClient), _pHeader(header) {}
+
+	void doTask()
+	{
+		_pClient->SendData(_pHeader);
+		delete _pHeader;
+	}
+
+private:
+	ClientSocket* _pClient;
+	DataHeader* _pHeader;
+};
+
+
+// 网络消息接受处理
 class CellServer
 {
 public:
@@ -297,7 +316,7 @@ public:
 	// 响应网络消息
 	virtual void OnNetMsg(ClientSocket* pClient, DataHeader* header)
 	{
-		_pNetEvent->OnNetMsg(pClient, header);
+		_pNetEvent->OnNetMsg(this, pClient, header);
 	}
 
 	// 发送消息
@@ -321,6 +340,7 @@ public:
 	void Start()
 	{
 		_thread = std::thread(std::mem_fn(&CellServer::OnRun), this);
+		_taskServer.Start();
 	}
 
 	int getClientCount()
@@ -328,6 +348,11 @@ public:
 		return _clients.size() + _clientsBuff.size();
 	}
 
+	void addSendTask(ClientSocket* pClient, DataHeader* header)
+	{
+		CellSendMsg2ClientTask* pTask = new CellSendMsg2ClientTask(pClient, header);
+		_taskServer.addTask(pTask);
+	}
 private:
 	SOCKET _sock;
 	std::unordered_map<SOCKET, ClientSocket*> _clients;	// 正式客户队列
@@ -335,6 +360,7 @@ private:
 	std::mutex _mutex;	// 缓冲队列的锁
 	std::thread _thread;
 	INetEvent* _pNetEvent;	// 网络事件对象
+	CellTaskServer _taskServer;
 };
 
 
@@ -567,7 +593,7 @@ public:
 	}
 
 	// 被多个线程触发，不安全
-	void OnNetMsg(ClientSocket* pClient, DataHeader* header)
+	void OnNetMsg(CellServer* pCellServer, ClientSocket* pClient, DataHeader* header)
 	{
 		_msgCount++;
 	}

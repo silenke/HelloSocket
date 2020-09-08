@@ -37,9 +37,9 @@ class MyServer : public EasyTCPServer
 	}
 
 	// 被多个线程触发，不安全
-	void OnNetMsg(ClientSocket* pClient, DataHeader* header)
+	void OnNetMsg(CellServer* pCellServer, ClientSocket* pClient, DataHeader* header)
 	{
-		EasyTCPServer::OnNetMsg(pClient, header);
+		EasyTCPServer::OnNetMsg(pCellServer, pClient, header);
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
@@ -51,8 +51,8 @@ class MyServer : public EasyTCPServer
 			//	<< "password=" << login->password << std::endl;
 
 			// 发送数据
-			LoginResult res;
-			pClient->SendData(&res);
+			LoginResult* pResult = new LoginResult();
+			pCellServer->addSendTask(pClient, pResult);
 		}
 		break;
 		case CMD_LOGOUT:
