@@ -569,6 +569,12 @@ public:
 	// 被多个线程触发，不安全
 	void OnNetMsg(ClientSocket* pClient, DataHeader* header)
 	{
+		_msgCount++;
+	}
+
+	// recv事件
+	void OnNetRecv(ClientSocket* pClient)
+	{
 		_recvCount++;
 	}
 

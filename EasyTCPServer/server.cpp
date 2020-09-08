@@ -25,21 +25,21 @@ class MyServer : public EasyTCPServer
 	// 被一个线程触发，安全
 	void OnNetJoin(ClientSocket* pClient)
 	{
-		_clientCount++;
-		std::cout << "client<" << pClient->sockfd() << ">join" << std::endl;
+		EasyTCPServer::OnNetJoin(pClient);
+		//std::cout << "client<" << pClient->sockfd() << ">join" << std::endl;
 	}
 
 	// 被多个线程触发，不安全
 	void OnNetLeave(ClientSocket* pClient)
 	{
-		_clientCount--;
-		std::cout << "client<" << pClient->sockfd() << ">leave" << std::endl;
+		EasyTCPServer::OnNetLeave(pClient);
+		//std::cout << "client<" << pClient->sockfd() << ">leave" << std::endl;
 	}
 
 	// 被多个线程触发，不安全
 	void OnNetMsg(ClientSocket* pClient, DataHeader* header)
 	{
-		_msgCount++;
+		EasyTCPServer::OnNetMsg(pClient, header);
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
@@ -76,12 +76,6 @@ class MyServer : public EasyTCPServer
 		}
 		break;
 		}
-	}
-
-	// recv事件
-	void OnNetRecv(ClientSocket* pClient)
-	{
-		_recvCount++;
 	}
 };
 
