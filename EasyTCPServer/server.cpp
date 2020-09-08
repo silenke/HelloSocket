@@ -63,16 +63,16 @@ class MyServer : public EasyTCPServer
 			//	<< "username=" << logout->username << std::endl;
 
 			// 发送数据
-			LogoutResult res;
-			pClient->SendData(&res);
+			LogoutResult* pResult = new LogoutResult();
+			pCellServer->addSendTask(pClient, pResult);
 		}
 		break;
 		default:
 		{
 			std::cout << "<socket=" << pClient->sockfd() << ">收到未知命令，"
 				<< "数据长度：" << header->len << std::endl;
-			DataHeader header;
-			pClient->SendData(&header);
+			DataHeader* pResult = new DataHeader();
+			pCellServer->addSendTask(pClient, pResult);
 		}
 		break;
 		}
