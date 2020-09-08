@@ -34,6 +34,7 @@
 
 #ifndef RECV_BUFF_SIZE
 #define RECV_BUFF_SIZE 10240
+#define SEND_BUFF_SIZE RECV_BUFF_SIZE
 #endif // !RECV_BUFF_SIZE
 
 // 客户端数据类型
@@ -68,17 +69,36 @@ public:
 	// 发送消息
 	int SendData(DataHeader* header)
 	{
-		if (header)
+		int ret = SOCKET_ERROR;
+
+		int nSendLen = header->len;
+		const char* pSendData = (const char*)header;
+
+		while (_lastSendPos + nSendLen >= SEND_BUFF_SIZE)
 		{
-			return send(_sockfd, (const char*)header, header->len, 0);
+			int nCopyLen = SEND_BUFF_SIZE - _lastSendPos;
+			memcpy(_szSendBuf + _lastSendPos, pSendData, nCopyLen);
+			ret = send(_sockfd, _szSendBuf, SEND_BUFF_SIZE, 0);
+			pSendData += nCopyLen;
+			nSendLen -= nCopyLen;
+			_lastSendPos = 0;
+			if (SOCKET_ERROR == ret)
+			{
+				return ret;
+			}
 		}
-		return SOCKET_ERROR;
+		memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);
+		_lastSendPos += nSendLen;
+
+		return ret;
 	}
 
 private:
 	SOCKET _sockfd;
 	char _szMsgBuf[RECV_BUFF_SIZE * 10]{};
 	int _lastPos = 0;
+	char _szSendBuf[SEND_BUFF_SIZE * 10]{};
+	int _lastSendPos = 0;
 };
 
 // 网络事件接口
