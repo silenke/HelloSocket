@@ -2,6 +2,7 @@
 #include <thread>
 #include "EasyTCPServer.hpp"
 
+
 bool g_bRun = true;
 void cmdThread()
 {
@@ -20,50 +21,51 @@ void cmdThread()
 	}
 }
 
+
 class MyServer : public EasyTCPServer
 {
 	// 被一个线程触发，安全
-	void OnNetJoin(ClientSocket* pClient)
+	void OnNetJoin(CellClient* pClient)
 	{
 		EasyTCPServer::OnNetJoin(pClient);
 		//std::cout << "client<" << pClient->sockfd() << ">join" << std::endl;
 	}
 
 	// 被多个线程触发，不安全
-	void OnNetLeave(ClientSocket* pClient)
+	void OnNetLeave(CellClient* pClient)
 	{
 		EasyTCPServer::OnNetLeave(pClient);
 		//std::cout << "client<" << pClient->sockfd() << ">leave" << std::endl;
 	}
 
 	// 被多个线程触发，不安全
-	void OnNetMsg(CellServer* pCellServer, ClientSocket* pClient, DataHeader* header)
+	void OnNetMsg(CellServer* pCellServer, CellClient* pClient, DataHeader* header)
 	{
 		EasyTCPServer::OnNetMsg(pCellServer, pClient, header);
 		switch (header->cmd)
 		{
 		case CMD_LOGIN:
 		{
-			Login* login = (Login*)header;
+			netmsg_Login* login = (netmsg_Login*)header;
 			//std::cout << "<socket=" << pClient->sockfd() << ">收到命令：CMD_LOGIN，"
 			//	<< "数据长度：" << header->len << std::endl
 			//	<< "username=" << login->username << " "
 			//	<< "password=" << login->password << std::endl;
 
 			// 发送数据
-			LoginResult* pResult = new LoginResult();
+			netmsg_LoginResult* pResult = new netmsg_LoginResult();
 			pCellServer->addSendTask(pClient, pResult);
 		}
 		break;
 		case CMD_LOGOUT:
 		{
-			Logout* logout = (Logout*)header;
+			netmsg_Logout* logout = (netmsg_Logout*)header;
 			//std::cout << "<socket=" << pClient->sockfd() << ">收到命令：CMD_LOGIN，"
 			//	<< "数据长度：" << header->len << std::endl
 			//	<< "username=" << logout->username << std::endl;
 
 			// 发送数据
-			LogoutResult* pResult = new LogoutResult();
+			netmsg_LogoutResult* pResult = new netmsg_LogoutResult();
 			pCellServer->addSendTask(pClient, pResult);
 		}
 		break;
@@ -78,6 +80,7 @@ class MyServer : public EasyTCPServer
 		}
 	}
 };
+
 
 int main()
 {

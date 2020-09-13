@@ -22,6 +22,7 @@
 #include <iostream>
 #include "MessageHeader.hpp"
 
+
 class EasyTCPClient
 {
 public:
@@ -195,7 +196,7 @@ public:
 		case CMD_LOGIN_RESULT:
 		{
 			// 接收数据
-			LoginResult* login = (LoginResult*)header;
+			netmsg_LoginResult* login = (netmsg_LoginResult*)header;
 			//std::cout << "<socket=" << _sock << ">收到命令：CMD_LOGIN_RESULT，"
 			//	<< "数据长度：" << header->len << std::endl;
 		}
@@ -203,7 +204,7 @@ public:
 		case CMD_LOGOUT_RESULT:
 		{
 			// 接收数据
-			LogoutResult* logout = (LogoutResult*)header;
+			netmsg_LogoutResult* logout = (netmsg_LogoutResult*)header;
 			//std::cout << "<socket=" << _sock << ">收到命令：CMD_LOGOUT_RESULT，"
 			//	<< "数据长度：" << header->len << std::endl;
 		}
@@ -211,7 +212,7 @@ public:
 		case CMD_NEW_USER_JOIN:
 		{
 			// 接收数据
-			NewUserJoin* userJoin = (NewUserJoin*)header;
+			netmsg_NewUserJoin* userJoin = (netmsg_NewUserJoin*)header;
 			//std::cout << "<socket=" << _sock << ">收到命令：CMD_NEW_USER_JOIN，"
 			//	<< "数据长度：" << header->len << std::endl;
 		}
@@ -250,5 +251,6 @@ private:
 	SOCKET _sock;
 	bool isConnected;
 };
+
 
 #endif // _EasyTCPClient_hpp_

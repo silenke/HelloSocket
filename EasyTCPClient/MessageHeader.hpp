@@ -21,52 +21,52 @@ struct DataHeader
 	short len;
 };
 
-struct Login : public DataHeader
+struct netmsg_Login : public DataHeader
 {
-	Login() {
+	netmsg_Login() {
 		cmd = CMD_LOGIN;
-		len = sizeof(Login);
+		len = sizeof(netmsg_Login);
 	}
 	char username[32];
 	char password[32];
 	char data[956];
 };
 
-struct LoginResult : public DataHeader
+struct netmsg_LoginResult : public DataHeader
 {
-	LoginResult() {
+	netmsg_LoginResult() {
 		cmd = CMD_LOGIN_RESULT;
-		len = sizeof(LoginResult);
+		len = sizeof(netmsg_LoginResult);
 		result = 0;
 	}
 	int result;
 	char data[1016];
 };
 
-struct Logout : public DataHeader
+struct netmsg_Logout : public DataHeader
 {
-	Logout() {
+	netmsg_Logout() {
 		cmd = CMD_LOGOUT;
-		len = sizeof(Logout);
+		len = sizeof(netmsg_Logout);
 	}
 	char username[32];
 };
 
-struct LogoutResult : public DataHeader
+struct netmsg_LogoutResult : public DataHeader
 {
-	LogoutResult() {
+	netmsg_LogoutResult() {
 		cmd = CMD_LOGOUT_RESULT;
-		len = sizeof(LogoutResult);
+		len = sizeof(netmsg_LogoutResult);
 		result = 0;
 	}
 	int result;
 };
 
-struct NewUserJoin : public DataHeader
+struct netmsg_NewUserJoin : public DataHeader
 {
-	NewUserJoin() {
+	netmsg_NewUserJoin() {
 		cmd = CMD_NEW_USER_JOIN;
-		len = sizeof(NewUserJoin);
+		len = sizeof(netmsg_NewUserJoin);
 	}
 	SOCKET sock;
 };

@@ -16,10 +16,12 @@
 	#define SOCKET_ERROR            (-1)
 #endif
 
+
 #include <iostream>
 #include <thread>
 #include "EasyTCPClient.hpp"
 #include "CELLTimestamp.hpp"
+
 
 bool g_bRun = true;
 void cmdThread()
@@ -35,14 +37,14 @@ void cmdThread()
 		}
 		//else if (!strcmp(cmdBuff, "login")) {
 		//	// 发送数据
-		//	Login login;
+		//	netmsg_Login login;
 		//	strcpy_s(login.username, "Peppa Pig");
 		//	strcpy_s(login.password, "15213");
 		//	client->SendData(&login);
 		//}
 		//else if (!strcmp(cmdBuff, "logout")) {
 		//	// 发送数据
-		//	Logout logout;
+		//	netmsg_Logout logout;
 		//	strcpy_s(logout.username, "Peppa Pig");
 		//	client->SendData(&logout);
 		//}
@@ -52,11 +54,13 @@ void cmdThread()
 	}
 }
 
+
 const int cCount = 100;
 const int tCount = 4;
 EasyTCPClient* clients[cCount];
 std::atomic_int sendCount = 0;
 std::atomic_int readCount = 0;
+
 
 void sendThread(int id)
 {
@@ -89,7 +93,7 @@ void sendThread(int id)
 		std::this_thread::sleep_for(t);
 	}
 
-	Login login;
+	netmsg_Login login;
 	strcpy_s(login.username, "Peppa Pig");
 	strcpy_s(login.password, "15213");
 
@@ -111,6 +115,7 @@ void sendThread(int id)
 		delete clients[i];
 	}
 }
+
 
 int main()
 {
