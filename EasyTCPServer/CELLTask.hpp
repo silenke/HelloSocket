@@ -7,22 +7,13 @@
 #include <functional>
 
 
-class CellTask
-{
-public:
-	CellTask() {}
-
-	virtual ~CellTask() {}
-
-	virtual void doTask() {}
-};
-
-
 class CellTaskServer
 {
+	typedef std::function<void()> CellTask;
+
 public:
 	// Ìí¼ÓÈÎÎñ
-	void addTask(CellTask* pTask)
+	void addTask(CellTask pTask)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		_tasksBuf.push_back(pTask);
@@ -60,16 +51,15 @@ protected:
 
 			for (auto pTask : _tasks)
 			{
-				pTask->doTask();
-				delete pTask;
+				CellTask();
 			}
 			_tasks.clear();
 		}
 	}
 
 private:
-	std::list<CellTask*> _tasks;
-	std::list<CellTask*> _tasksBuf;
+	std::list<CellTask> _tasks;
+	std::list<CellTask> _tasksBuf;
 	std::mutex _mutex;
 };
 

@@ -15,25 +15,6 @@
 #include <atomic>
 
 
-// 网络消息发送任务
-class CellSendMsg2ClientTask : public CellTask
-{
-public:
-	CellSendMsg2ClientTask(CellClient* pClient, DataHeader* header)
-		: _pClient(pClient), _pHeader(header) {}
-
-	void doTask()
-	{
-		_pClient->SendData(_pHeader);
-		delete _pHeader;
-	}
-
-private:
-	CellClient* _pClient;
-	DataHeader* _pHeader;
-};
-
-
 // 网络消息接受处理
 class CellServer
 {
@@ -247,8 +228,8 @@ public:
 
 	void addSendTask(CellClient* pClient, DataHeader* header)
 	{
-		CellSendMsg2ClientTask* pTask = new CellSendMsg2ClientTask(pClient, header);
-		_taskServer.addTask(pTask);
+		_taskServer.addTask([pClient, header]() {
+			pClient->SendData(header); });
 	}
 private:
 	SOCKET _sock;
