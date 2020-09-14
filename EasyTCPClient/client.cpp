@@ -55,7 +55,7 @@ void cmdThread()
 }
 
 
-const int cCount = 100;
+const int cCount = 16;
 const int tCount = 4;
 EasyTCPClient* clients[cCount];
 std::atomic_int sendCount = 0;

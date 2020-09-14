@@ -84,6 +84,7 @@ public:
 			{
 				std::chrono::milliseconds t(1);
 				std::this_thread::sleep_for(t);
+				_oldTime = CELLTime::getNowInMillSec();
 				continue;
 			}
 
@@ -107,8 +108,8 @@ public:
 				memcpy(&fdRead, &_fdRead_bak, sizeof(fd_set));
 			}
 
-			//timeval t{ 0, 0 };
-			int ret = select(_maxSock + 1, &fdRead, nullptr, nullptr, nullptr);
+			timeval t{ 0, 1 };
+			int ret = select(_maxSock + 1, &fdRead, nullptr, nullptr, &t);
 			//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
 			if (ret < 0)
 			{
@@ -120,38 +121,72 @@ public:
 			//	continue;
 			//}
 
-#ifdef _WIN32
-			for (int i = 0; i < fdRead.fd_count; i++)
-			{
-				auto pClient = _clients[fdRead.fd_array[i]];
-				if (-1 == RecvData(pClient))
-				{
-					if (_pNetEvent)
-						_pNetEvent->OnNetLeave(pClient);
-					delete pClient;
-					_clients.erase(fdRead.fd_array[i]);
-					_clients_changed = true;
-				}
-			}
-#else
-			for (auto p : _clients)
-			{
-				if (FD_ISSET(p.first, &fdRead))
-				{
-					if (-1 == RecvData(p.second))
-					{
-						if (_pNetEvent)
-							_pNetEvent->OnNetLeave(p.second);
-						delete p.second;
-						_clients.erase(p.first);
-						_clients_changed = true;
-					}
-				}
-			}
-#endif	// _WIN32
+			ReadData(fdRead);
+			CheckTime();
 		}
 
 		return true;
+	}
+
+	time_t _oldTime = CELLTime::getNowInMillSec();
+	void CheckTime()
+	{
+		auto nowTime = CELLTime::getNowInMillSec();
+		auto dt = nowTime - _oldTime;
+		_oldTime = nowTime;
+
+		for (auto it = _clients.begin(); it != _clients.end(); )
+		{
+			if (it->second->checkHeart(dt))
+			{
+				if (_pNetEvent)
+					_pNetEvent->OnNetLeave(it->second);
+				closesocket(it->first);
+				delete it->second;
+				_clients.erase(it++);
+				_clients_changed = true;
+			}
+			else
+			{
+				it++;
+			}
+		}
+	}
+
+	void ReadData(fd_set& fdRead)
+	{
+#ifdef _WIN32
+		for (int i = 0; i < fdRead.fd_count; i++)
+		{
+			auto pClient = _clients[fdRead.fd_array[i]];
+			if (-1 == RecvData(pClient))
+			{
+				if (_pNetEvent)
+					_pNetEvent->OnNetLeave(pClient);
+				closesocket(fdRead.fd_array[i]);
+				delete pClient;
+				_clients.erase(fdRead.fd_array[i]);
+				_clients_changed = true;
+			}
+		}
+#else
+		for (auto it = _clients.begin(); it != _clients.end(); )
+		{
+			if (FD_ISSET(it->first, &fdRead) && -1 == RecvData(it->second))
+			{
+				if (_pNetEvent)
+					_pNetEvent->OnNetLeave(it->second);
+				close(it->first);
+				delete it->second;
+				_clients.erase(it++);
+				_clients_changed = true;
+			}
+			else
+			{
+				it++;
+			}
+		}
+#endif	// _WIN32
 	}
 
 	bool isRun()
@@ -175,9 +210,9 @@ public:
 		}
 		memcpy(pClient->msgBuf() + pClient->getLast(), szRecv, nLen);	// 直接用这个接收！！！！！！
 		pClient->setLast(pClient->getLast() + nLen);
-		while (pClient->getLast() >= sizeof(DataHeader))
+		while (pClient->getLast() >= sizeof(netmsg_DataHeader))
 		{
-			DataHeader* header = (DataHeader*)pClient->msgBuf();
+			netmsg_DataHeader* header = (netmsg_DataHeader*)pClient->msgBuf();
 			if (pClient->getLast() >= header->len)
 			{
 				int nSize = pClient->getLast() - header->len;
@@ -192,13 +227,13 @@ public:
 	}
 
 	// 响应网络消息
-	virtual void OnNetMsg(CellClient* pClient, DataHeader* header)
+	virtual void OnNetMsg(CellClient* pClient, netmsg_DataHeader* header)
 	{
 		_pNetEvent->OnNetMsg(this, pClient, header);
 	}
 
 	// 发送消息
-	int SendData(SOCKET cSock, DataHeader* header)
+	int SendData(SOCKET cSock, netmsg_DataHeader* header)
 	{
 		if (isRun() && header)
 		{
@@ -226,7 +261,7 @@ public:
 		return _clients.size() + _clientsBuff.size();
 	}
 
-	void addSendTask(CellClient* pClient, DataHeader* header)
+	void addSendTask(CellClient* pClient, netmsg_DataHeader* header)
 	{
 		_taskServer.addTask([pClient, header]() {
 			pClient->SendData(header); });

@@ -1,6 +1,7 @@
 #ifndef _CELL_TASK_H_
 #define _CELL_TASK_H_
 
+
 #include <thread>
 #include <mutex>
 #include <list>
@@ -51,7 +52,7 @@ protected:
 
 			for (auto pTask : _tasks)
 			{
-				CellTask();
+				pTask();
 			}
 			_tasks.clear();
 		}

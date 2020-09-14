@@ -228,7 +228,7 @@ public:
 	}
 
 	// 发送消息
-	void SendData2All(DataHeader* header)
+	void SendData2All(netmsg_DataHeader* header)
 	{
 
 	}
@@ -246,7 +246,7 @@ public:
 	}
 
 	// 被多个线程触发，不安全
-	void OnNetMsg(CellServer* pCellServer, CellClient* pClient, DataHeader* header)
+	void OnNetMsg(CellServer* pCellServer, CellClient* pClient, netmsg_DataHeader* header)
 	{
 		_msgCount++;
 	}

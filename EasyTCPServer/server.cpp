@@ -39,7 +39,7 @@ class MyServer : public EasyTCPServer
 	}
 
 	// 被多个线程触发，不安全
-	void OnNetMsg(CellServer* pCellServer, CellClient* pClient, DataHeader* header)
+	void OnNetMsg(CellServer* pCellServer, CellClient* pClient, netmsg_DataHeader* header)
 	{
 		EasyTCPServer::OnNetMsg(pCellServer, pClient, header);
 		switch (header->cmd)
@@ -51,6 +51,8 @@ class MyServer : public EasyTCPServer
 			//	<< "数据长度：" << header->len << std::endl
 			//	<< "username=" << login->username << " "
 			//	<< "password=" << login->password << std::endl;
+
+			pClient->resetDTHeart();
 
 			// 发送数据
 			netmsg_LoginResult* pResult = new netmsg_LoginResult();
@@ -69,11 +71,18 @@ class MyServer : public EasyTCPServer
 			pCellServer->addSendTask(pClient, pResult);
 		}
 		break;
+		case CMD_HEART_C2S:
+		{
+			pClient->resetDTHeart();
+			netmsg_Heart_S2C* pHeart = new netmsg_Heart_S2C();
+			pCellServer->addSendTask(pClient, pHeart);
+		}
+		break;
 		default:
 		{
 			std::cout << "<socket=" << pClient->sockfd() << ">收到未知命令，"
 				<< "数据长度：" << header->len << std::endl;
-			DataHeader* pResult = new DataHeader();
+			netmsg_DataHeader* pResult = new netmsg_DataHeader();
 			pCellServer->addSendTask(pClient, pResult);
 		}
 		break;

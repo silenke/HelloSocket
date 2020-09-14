@@ -172,9 +172,9 @@ public:
 		}
 		memcpy(_szMsgBuf + _lastPos, _szRecv, nLen);
 		_lastPos += nLen;
-		while (_lastPos >= sizeof(DataHeader))
+		while (_lastPos >= sizeof(netmsg_DataHeader))
 		{
-			DataHeader* header = (DataHeader*)_szMsgBuf;
+			netmsg_DataHeader* header = (netmsg_DataHeader*)_szMsgBuf;
 			if (_lastPos >= header->len)
 			{
 				int nSize = _lastPos - header->len;
@@ -189,7 +189,7 @@ public:
 	}
 
 	// 响应网络消息
-	virtual void OnNetMsg(DataHeader* header)
+	virtual void OnNetMsg(netmsg_DataHeader* header)
 	{
 		switch (header->cmd)
 		{
@@ -233,7 +233,7 @@ public:
 	}
 
 	// 发送消息
-	int SendData(DataHeader* header)
+	int SendData(netmsg_DataHeader* header)
 	{
 		int ret = SOCKET_ERROR;
 		if (isRun() && header)
