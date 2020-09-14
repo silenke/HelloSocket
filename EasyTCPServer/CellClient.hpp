@@ -7,7 +7,8 @@
 #include <iostream>
 
 
-#define CLIENT_HEART_DEAD_TIME 5000
+#define CLIENT_HEART_DEAD_TIME 60000
+#define CLIENT_SEND_BUFF_TIME 200
 
 
 // 客户端数据类型
@@ -18,6 +19,7 @@ public:
 	{
 		_sockfd = sockfd;
 		resetDTHeart();
+		resetDTSend();
 	}
 
 	SOCKET sockfd()
@@ -40,6 +42,27 @@ public:
 		_lastPos = pos;
 	}
 
+	// 立即发送数据
+	int SendDataReal(netmsg_DataHeader* header)
+	{
+		SendData(header);
+		SendDataReal();
+	}
+
+	// 立即发送缓冲区数据
+	int SendDataReal()
+	{
+		int ret = SOCKET_ERROR;
+
+		if (_lastSendPos > 0 && SOCKET_ERROR != _sockfd)
+		{
+			ret = send(_sockfd, _szSendBuf, _lastSendPos, 0);
+			_lastSendPos = 0;
+			resetDTSend();
+		}
+		return ret;
+	}
+
 	// 发送消息
 	int SendData(netmsg_DataHeader* header)
 	{
@@ -56,6 +79,8 @@ public:
 			pSendData += nCopyLen;
 			nSendLen -= nCopyLen;
 			_lastSendPos = 0;
+			resetDTSend();
+
 			if (SOCKET_ERROR == ret)
 			{
 				return ret;
@@ -72,6 +97,11 @@ public:
 		_dtHeart = 0;
 	}
 
+	void resetDTSend()
+	{
+		_dtSend = 0;
+	}
+
 	bool checkHeart(time_t dt)
 	{
 		_dtHeart += dt;
@@ -84,6 +114,21 @@ public:
 		return false;
 	}
 
+	bool checkSend(time_t dt)
+	{
+		_dtSend += dt;
+		if (_dtSend >= CLIENT_SEND_BUFF_TIME)
+		{
+			//std::cout << "checkSend：socket=" << _sockfd
+			//	<< "，time=" << _dtHeart << std::endl;
+
+			SendDataReal();
+			resetDTSend();
+			return true;
+		}
+		return false;
+	}
+
 private:
 	SOCKET _sockfd;
 	char _szMsgBuf[RECV_BUFF_SIZE * 10]{};
@@ -91,6 +136,7 @@ private:
 	char _szSendBuf[SEND_BUFF_SIZE * 10]{};
 	int _lastSendPos = 0;
 	time_t _dtHeart;
+	time_t _dtSend;
 };
 
 

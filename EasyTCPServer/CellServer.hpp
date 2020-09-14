@@ -137,6 +137,7 @@ public:
 
 		for (auto it = _clients.begin(); it != _clients.end(); )
 		{
+			// 心跳检测
 			if (it->second->checkHeart(dt))
 			{
 				if (_pNetEvent)
@@ -147,7 +148,8 @@ public:
 				_clients_changed = true;
 			}
 			else
-			{
+			{	// 定时发送检测
+				it->second->checkSend(dt);
 				it++;
 			}
 		}
