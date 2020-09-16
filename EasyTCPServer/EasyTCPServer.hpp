@@ -136,7 +136,7 @@ public:
 	{
 		for (int i = 0; i < nCellServer; i++)
 		{
-			auto ser = new CellServer(_sock);
+			auto ser = new CellServer(i);
 			_cellServers.push_back(ser);
 			ser->setEventObj(this);	// 注册网络事件接收对象
 			ser->Start();	// 启动消息处理线程
@@ -146,10 +146,18 @@ public:
 	// 关闭套接字
 	void Close()
 	{
+		std::cout << "EasyTCPServer.Close begin" << std::endl;
+		//
 		if (INVALID_SOCKET == _sock)
 		{
 			return;
 		}
+
+		for (auto s : _cellServers)
+		{
+			delete s;
+		}
+		_cellServers.clear();
 
 #ifdef _WIN32
 		// 关闭套接字
@@ -162,6 +170,8 @@ public:
 #endif
 		// _clients.clear();
 		_sock = INVALID_SOCKET;
+		//
+		std::cout << "EasyTCPServer.Close end" << std::endl;
 	}
 
 	// 处理网络消息

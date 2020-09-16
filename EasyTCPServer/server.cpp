@@ -111,6 +111,10 @@ int main()
 	server.Close();
 	std::cout << "ÒÑÍË³ö£¡" << std::endl;
 
-	Sleep(10000);
+	while (true)
+	{
+		Sleep(1);
+	}
+	
 	return 0;
 }

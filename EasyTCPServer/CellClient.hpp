@@ -17,9 +17,30 @@ class CellClient
 public:
 	CellClient(SOCKET sockfd = INVALID_SOCKET)
 	{
+		static int n = 0;
+		id = n++;
+
 		_sockfd = sockfd;
 		resetDTHeart();
 		resetDTSend();
+	}
+
+	~CellClient()
+	{
+		std::cout << serverId << "£ºCellClient<" << id
+			<< ">.~CellClient" << std::endl;
+
+		if (INVALID_SOCKET == _sockfd)
+		{
+			return;
+		}
+
+#ifdef _WIN32
+		closesocket(_sockfd);
+#else
+		close(_sockfd);
+#endif
+		_sockfd = INVALID_SOCKET;
 	}
 
 	SOCKET sockfd()
@@ -128,6 +149,10 @@ public:
 		}
 		return false;
 	}
+	
+public:
+	int serverId = -1;
+	int id = -1;
 
 private:
 	SOCKET _sockfd;

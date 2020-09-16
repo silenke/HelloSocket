@@ -4,6 +4,7 @@
 
 #include "Cell.hpp"
 #include "INetEvent.hpp"
+#include "CELLSemaphore.hpp"
 
 #include <iostream>
 #include <vector>
@@ -19,15 +20,20 @@
 class CellServer
 {
 public:
-	CellServer(SOCKET sock = INVALID_SOCKET)
+	CellServer(int id)
 	{
-		_sock = sock;
+		_id = id;
 		_pNetEvent = nullptr;
+		_taskServer.serverId = _id;
 	}
 
 	~CellServer()
 	{
+		std::cout << "\tCellServer<" << _id
+			<< ">.~CellServer exit begin" << std::endl;
 		Close();
+		std::cout << "\tCellServer<" << _id
+			<< ">.~CellServer exit end" << std::endl;
 	}
 
 	void setEventObj(INetEvent* event)
@@ -38,36 +44,22 @@ public:
 	// 关闭套接字
 	void Close()
 	{
-		if (INVALID_SOCKET == _sock)
+		std::cout << "\t\tCellServer<" << _id
+			<< ">.Close exit begin" << std::endl;
+		if (_bRun)
 		{
-			return;
+			_taskServer.Close();
+			_bRun = false;
+			_sem.wait();
 		}
-
-#ifdef _WIN32
-		// 关闭套接字
-		for (auto p : _clients)
-		{
-			closesocket(p.first);
-			delete p.second;
-		}
-#else
-		for (auto p : _clients)
-		{
-			close(p.first);
-			delete p.second;
-		}
-#endif
-		_clients.clear();
+		std::cout << "\t\tCellServer<" << _id
+			<< ">.Close exit end" << std::endl;
 	}
 
 	// 处理网络消息
-	fd_set _fdRead_bak;
-	bool _clients_changed;
-	SOCKET _maxSock;
-	bool OnRun()
+	void OnRun()
 	{
-		_clients_changed = true;
-		while (isRun())
+		while (_bRun)
 		{
 			if (!_clientsBuff.empty())
 			{
@@ -75,6 +67,9 @@ public:
 				for (auto pClient : _clientsBuff)
 				{
 					_clients[pClient->sockfd()] = pClient;
+					pClient->serverId = _id;
+					//if (_pNetEvent)
+					//	_pNetEvent->OnNetJoin(pClient);
 				}
 				_clientsBuff.clear();
 				_clients_changed = true;
@@ -114,7 +109,7 @@ public:
 			if (ret < 0)
 			{
 				std::cout << "select任务结束！" << std::endl;
-				return false;
+				return;
 			}
 			//else if (ret == 0)
 			//{
@@ -125,10 +120,13 @@ public:
 			CheckTime();
 		}
 
-		return true;
+		std::cout << "\t\t\tCellServer<" << _id
+			<< ">.OnRun exit" << std::endl;
+
+		ClearClients();
+		_sem.wakeup();
 	}
 
-	time_t _oldTime = CELLTime::getNowInMillSec();
 	void CheckTime()
 	{
 		auto nowTime = CELLTime::getNowInMillSec();
@@ -142,7 +140,6 @@ public:
 			{
 				if (_pNetEvent)
 					_pNetEvent->OnNetLeave(it->second);
-				closesocket(it->first);
 				delete it->second;
 				_clients.erase(it++);
 				_clients_changed = true;
@@ -165,7 +162,6 @@ public:
 			{
 				if (_pNetEvent)
 					_pNetEvent->OnNetLeave(pClient);
-				closesocket(fdRead.fd_array[i]);
 				delete pClient;
 				_clients.erase(fdRead.fd_array[i]);
 				_clients_changed = true;
@@ -178,7 +174,6 @@ public:
 			{
 				if (_pNetEvent)
 					_pNetEvent->OnNetLeave(it->second);
-				close(it->first);
 				delete it->second;
 				_clients.erase(it++);
 				_clients_changed = true;
@@ -189,11 +184,6 @@ public:
 			}
 		}
 #endif	// _WIN32
-	}
-
-	bool isRun()
-	{
-		return INVALID_SOCKET != _sock;
 	}
 
 	// 缓冲区
@@ -237,7 +227,7 @@ public:
 	// 发送消息
 	int SendData(SOCKET cSock, netmsg_DataHeader* header)
 	{
-		if (isRun() && header)
+		if (_bRun && header)
 		{
 			return send(cSock, (const char*)header, header->len, 0);
 		}
@@ -254,7 +244,11 @@ public:
 
 	void Start()
 	{
+		if (_bRun) return;
+
+		_bRun = true;
 		_thread = std::thread(std::mem_fn(&CellServer::OnRun), this);
+		_thread.detach();
 		_taskServer.Start();
 	}
 
@@ -268,6 +262,22 @@ public:
 		_taskServer.addTask([pClient, header]() {
 			pClient->SendData(header); });
 	}
+
+private:
+	void ClearClients()
+	{
+		for (auto p : _clients)
+		{
+			delete p.second;
+		}
+		_clients.clear();
+		for (auto p : _clientsBuff)
+		{
+			delete p;
+		}
+		_clientsBuff.clear();
+	}
+
 private:
 	SOCKET _sock;
 	std::unordered_map<SOCKET, CellClient*> _clients;	// 正式客户队列
@@ -276,6 +286,13 @@ private:
 	std::thread _thread;
 	INetEvent* _pNetEvent;	// 网络事件对象
 	CellTaskServer _taskServer;
+	fd_set _fdRead_bak;
+	SOCKET _maxSock;
+	time_t _oldTime = CELLTime::getNowInMillSec();
+	int _id = -1;
+	bool _clients_changed = true;
+	bool _bRun = false;
+	CELLSemaphore _sem;
 };
 
 
