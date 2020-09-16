@@ -4,7 +4,7 @@
 
 #include "Cell.hpp"
 #include "INetEvent.hpp"
-#include "CELLSemaphore.hpp"
+#include "CELLThread.hpp"
 
 #include <iostream>
 #include <vector>
@@ -46,20 +46,16 @@ public:
 	{
 		std::cout << "\t\tCellServer<" << _id
 			<< ">.Close exit begin" << std::endl;
-		if (_bRun)
-		{
 			_taskServer.Close();
-			_bRun = false;
-			_sem.wait();
-		}
+			_thread.Close();
 		std::cout << "\t\tCellServer<" << _id
 			<< ">.Close exit end" << std::endl;
 	}
 
 	// 处理网络消息
-	void OnRun()
+	void OnRun(CELLThread* pThread)
 	{
-		while (_bRun)
+		while (pThread->isRun())
 		{
 			if (!_clientsBuff.empty())
 			{
@@ -108,8 +104,10 @@ public:
 			//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
 			if (ret < 0)
 			{
-				std::cout << "select任务结束！" << std::endl;
-				return;
+				std::cout << "CellServer<" << _id
+					<< ">.OnRun.select Error！" << std::endl;
+				pThread->Exit();
+				break;
 			}
 			//else if (ret == 0)
 			//{
@@ -122,9 +120,6 @@ public:
 
 		std::cout << "\t\t\tCellServer<" << _id
 			<< ">.OnRun exit" << std::endl;
-
-		ClearClients();
-		_sem.wakeup();
 	}
 
 	void CheckTime()
@@ -244,12 +239,10 @@ public:
 
 	void Start()
 	{
-		if (_bRun) return;
-
-		_bRun = true;
-		_thread = std::thread(std::mem_fn(&CellServer::OnRun), this);
-		_thread.detach();
 		_taskServer.Start();
+		_thread.Start(nullptr,
+			[this](CELLThread* pThread) {OnRun(pThread); },
+			[this](CELLThread* pThread) {ClearClients(); });
 	}
 
 	int getClientCount()
@@ -283,7 +276,6 @@ private:
 	std::unordered_map<SOCKET, CellClient*> _clients;	// 正式客户队列
 	std::vector<CellClient*> _clientsBuff;	// 缓冲客户队列
 	std::mutex _mutex;	// 缓冲队列的锁
-	std::thread _thread;
 	INetEvent* _pNetEvent;	// 网络事件对象
 	CellTaskServer _taskServer;
 	fd_set _fdRead_bak;
@@ -292,7 +284,7 @@ private:
 	int _id = -1;
 	bool _clients_changed = true;
 	bool _bRun = false;
-	CELLSemaphore _sem;
+	CELLThread _thread;
 };
 
 

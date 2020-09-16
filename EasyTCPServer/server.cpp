@@ -3,23 +3,23 @@
 #include "EasyTCPServer.hpp"
 
 
-bool g_bRun = true;
-void cmdThread()
-{
-	while (true)
-	{
-		char cmdBuff[128]{};
-		std::cin >> cmdBuff;
-		if (!strcmp(cmdBuff, "exit")) {
-			g_bRun = false;
-			std::cout << "收到退出命令，结束任务！" << std::endl;
-			return;
-		}
-		else {
-			std::cout << "不支持的命令，请重新输入！" << std::endl;
-		}
-	}
-}
+//bool g_bRun = true;
+//void cmdThread()
+//{
+//	while (true)
+//	{
+//		char cmdBuff[128]{};
+//		std::cin >> cmdBuff;
+//		if (!strcmp(cmdBuff, "exit")) {
+//			g_bRun = false;
+//			std::cout << "收到退出命令，结束任务！" << std::endl;
+//			return;
+//		}
+//		else {
+//			std::cout << "不支持的命令，请重新输入！" << std::endl;
+//		}
+//	}
+//}
 
 
 class MyServer : public EasyTCPServer
@@ -100,15 +100,23 @@ int main()
 	server.Start(4);
 
 	// 启动UI线程
-	std::thread t1(cmdThread);
-	t1.detach();
+	//std::thread t1(cmdThread);
+	//t1.detach();
 
-	while (g_bRun)
+	while (true)
 	{
-		server.OnRun();
+		char cmdBuff[128]{};
+		std::cin >> cmdBuff;
+		if (!strcmp(cmdBuff, "exit")) {
+			server.Close();
+			std::cout << "收到退出命令，结束任务！" << std::endl;
+			break;
+		}
+		else {
+			std::cout << "不支持的命令，请重新输入！" << std::endl;
+		}
 	}
 
-	server.Close();
 	std::cout << "已退出！" << std::endl;
 
 	while (true)

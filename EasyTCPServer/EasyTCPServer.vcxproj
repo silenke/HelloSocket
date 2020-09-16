@@ -148,6 +148,7 @@
     <ClInclude Include="CELLSemaphore.hpp" />
     <ClInclude Include="CellServer.hpp" />
     <ClInclude Include="CellTask.hpp" />
+    <ClInclude Include="CELLThread.hpp" />
     <ClInclude Include="CellTimestamp.hpp" />
     <ClInclude Include="EasyTCPServer.hpp" />
     <ClInclude Include="INetEvent.hpp" />

@@ -27,7 +27,8 @@ public:
 
 	~CellClient()
 	{
-		std::cout << serverId << "：CellClient<" << id
+		std::cout << "\t\t\t\tserver<" << serverId
+			<< ">.CellClient<" << id
 			<< ">.~CellClient" << std::endl;
 
 		if (INVALID_SOCKET == _sockfd)
@@ -64,7 +65,7 @@ public:
 	}
 
 	// 立即发送数据
-	int SendDataReal(netmsg_DataHeader* header)
+	void SendDataReal(netmsg_DataHeader* header)
 	{
 		SendData(header);
 		SendDataReal();

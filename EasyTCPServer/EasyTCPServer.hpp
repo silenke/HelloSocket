@@ -6,6 +6,7 @@
 #include "CellClient.hpp"
 #include "CellServer.hpp"
 #include "INetEvent.hpp"
+#include "CELLThread.hpp"
 
 #include <iostream>
 #include <vector>
@@ -141,6 +142,7 @@ public:
 			ser->setEventObj(this);	// 注册网络事件接收对象
 			ser->Start();	// 启动消息处理线程
 		}
+		_thread.Start(nullptr, [this](CELLThread* pThread) {OnRun(pThread); });
 	}
 
 	// 关闭套接字
@@ -148,6 +150,7 @@ public:
 	{
 		std::cout << "EasyTCPServer.Close begin" << std::endl;
 		//
+		_thread.Close();
 		if (INVALID_SOCKET == _sock)
 		{
 			return;
@@ -172,50 +175,6 @@ public:
 		_sock = INVALID_SOCKET;
 		//
 		std::cout << "EasyTCPServer.Close end" << std::endl;
-	}
-
-	// 处理网络消息
-	bool OnRun()
-	{
-		if (!isRun())
-		{
-			return false;
-		}
-
-		time4msg();
-
-		fd_set fdRead;
-		//fd_set fdWrite;
-		//fd_set fdExp;
-
-		FD_ZERO(&fdRead);
-		//FD_ZERO(&fdWrite);
-		//FD_ZERO(&fdExp);
-
-		FD_SET(_sock, &fdRead);
-		//FD_SET(_sock, &fdWrite);
-		//FD_SET(_sock, &fdExp);
-
-		timeval t{ 0, 10 };
-		int ret = select(_sock + 1, &fdRead, nullptr, nullptr, &t);
-		//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
-		if (ret < 0)
-		{
-			std::cout << "accept select任务结束！" << std::endl;
-			return false;
-		}
-		if (FD_ISSET(_sock, &fdRead))
-		{
-			FD_CLR(_sock, &fdRead);
-			// 接受连接
-			Accept();
-		}
-		return true;
-	}
-
-	bool isRun()
-	{
-		return INVALID_SOCKET != _sock;
 	}
 
 	// 计数输出每秒收到的网络消息
@@ -268,9 +227,48 @@ public:
 	}
 
 private:
+	// 处理网络消息
+	void OnRun(CELLThread* pThread)
+	{
+		while (pThread->isRun())
+		{
+			time4msg();
+
+			fd_set fdRead;
+			//fd_set fdWrite;
+			//fd_set fdExp;
+
+			FD_ZERO(&fdRead);
+			//FD_ZERO(&fdWrite);
+			//FD_ZERO(&fdExp);
+
+			FD_SET(_sock, &fdRead);
+			//FD_SET(_sock, &fdWrite);
+			//FD_SET(_sock, &fdExp);
+
+			timeval t{ 0, 1 };
+			int ret = select(_sock + 1, &fdRead, nullptr, nullptr, &t);
+			//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
+			if (ret < 0)
+			{
+				std::cout << "EasyTCPServer.OnRun select error！" << std::endl;
+				pThread->Exit();
+				break;
+			}
+			if (FD_ISSET(_sock, &fdRead))
+			{
+				FD_CLR(_sock, &fdRead);
+				// 接受连接
+				Accept();
+			}
+		}
+	}
+
+private:
 	SOCKET _sock;
 	std::vector<CellServer*> _cellServers;	// 处理消息对象，内部会创建线程
 	CELLTimestamp _tTime;	// 每秒消息计时
+	CELLThread _thread;
 
 protected:
 	std::atomic_int _msgCount;	// 收到消息计数
