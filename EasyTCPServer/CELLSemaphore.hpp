@@ -3,6 +3,7 @@
 
 
 #include <mutex>
+#include <condition_variable>
 
 
 class CELLSemaphore
@@ -20,24 +21,29 @@ public:
 
 	void wait()
 	{
-		_isWaitExit = true;
-		while (_isWaitExit)	// 阻塞等待
+		std::unique_lock<std::mutex> lock(_mutex);
+		if (--_wait < 0)
 		{
-			std::chrono::milliseconds t(1);
-			std::this_thread::sleep_for(t);
+			_cv.wait(lock, [this]() {return _wakeup > 0; });
+			--_wakeup;
 		}
 	}
 
 	void wakeup()
 	{
-		if (_isWaitExit)
-			_isWaitExit = false;
-		else
-			std::cout << "CELLSemaphore wakeup error." << std::endl;
+		std::lock_guard<std::mutex> lock(_mutex);
+		if (++_wait <= 0)
+		{
+			++_wakeup;
+			_cv.notify_one();
+		}
 	}
 
 private:
-	bool _isWaitExit = false;
+	std::mutex _mutex;
+	std::condition_variable _cv;
+	int _wait = 0;		// 等待计数
+	int _wakeup = 0;	// 唤醒计数
 };
 
 
