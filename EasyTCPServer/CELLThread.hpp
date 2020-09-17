@@ -2,16 +2,16 @@
 #define _CELL_THREAD_HPP_
 
 
-#include "CELLSemaphore.hpp"
+#include "CellSemaphore.hpp"
 
 #include <mutex>
 #include <functional>
 
 
-class CELLThread
+class CellThread
 {
 private:
-	typedef std::function<void(CELLThread*)> EventCall;
+	typedef std::function<void(CellThread*)> EventCall;
 
 public:
 	// Æô¶¯Ïß³Ì
@@ -27,7 +27,7 @@ public:
 			if (onRun) _onRun = onRun;
 			if (onDestroy) _onDestroy = onDestroy;
 
-			std::thread t(std::mem_fun(&CELLThread::OnWork), this);
+			std::thread t(std::mem_fun(&CellThread::OnWork), this);
 			t.detach();
 		}
 	}
@@ -73,7 +73,7 @@ private:
 	EventCall _onRun;
 	EventCall _onDestroy;
 	std::mutex _mutex;
-	CELLSemaphore _sem;
+	CellSemaphore _sem;
 	bool _isRun = false;
 };
 

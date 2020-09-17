@@ -2,7 +2,7 @@
 #define _CELL_TASK_H_
 
 
-#include "CELLThread.hpp"
+#include "CellThread.hpp"
 
 #include <thread>
 #include <mutex>
@@ -25,7 +25,7 @@ public:
 	// 启动服务
 	void Start()
 	{
-		_thread.Start(nullptr, [this](CELLThread* pThread) {OnRun(pThread); });
+		_thread.Start(nullptr, [this](CellThread* pThread) {OnRun(pThread); });
 	}
 
 	void Close()
@@ -39,7 +39,7 @@ public:
 
 protected:
 	// 工作函数
-	void OnRun(CELLThread* pThread)
+	void OnRun(CellThread* pThread)
 	{
 		while (pThread->isRun())
 		{
@@ -78,7 +78,7 @@ private:
 	std::list<CellTask> _tasksBuf;
 	std::mutex _mutex;
 	bool _isWaitExit = false;
-	CELLThread _thread;
+	CellThread _thread;
 };
 
 

@@ -6,7 +6,7 @@
 #include "CellClient.hpp"
 #include "CellServer.hpp"
 #include "INetEvent.hpp"
-#include "CELLThread.hpp"
+#include "CellThread.hpp"
 
 #include <iostream>
 #include <vector>
@@ -142,7 +142,7 @@ public:
 			ser->setEventObj(this);	// 注册网络事件接收对象
 			ser->Start();	// 启动消息处理线程
 		}
-		_thread.Start(nullptr, [this](CELLThread* pThread) {OnRun(pThread); });
+		_thread.Start(nullptr, [this](CellThread* pThread) {OnRun(pThread); });
 	}
 
 	// 关闭套接字
@@ -228,7 +228,7 @@ public:
 
 private:
 	// 处理网络消息
-	void OnRun(CELLThread* pThread)
+	void OnRun(CellThread* pThread)
 	{
 		while (pThread->isRun())
 		{
@@ -268,7 +268,7 @@ private:
 	SOCKET _sock;
 	std::vector<CellServer*> _cellServers;	// 处理消息对象，内部会创建线程
 	CELLTimestamp _tTime;	// 每秒消息计时
-	CELLThread _thread;
+	CellThread _thread;
 
 protected:
 	std::atomic_int _msgCount;	// 收到消息计数

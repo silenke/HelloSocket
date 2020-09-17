@@ -4,7 +4,7 @@
 
 #include "Cell.hpp"
 #include "INetEvent.hpp"
-#include "CELLThread.hpp"
+#include "CellThread.hpp"
 
 #include <iostream>
 #include <vector>
@@ -53,7 +53,7 @@ public:
 	}
 
 	// 处理网络消息
-	void OnRun(CELLThread* pThread)
+	void OnRun(CellThread* pThread)
 	{
 		while (pThread->isRun())
 		{
@@ -241,8 +241,8 @@ public:
 	{
 		_taskServer.Start();
 		_thread.Start(nullptr,
-			[this](CELLThread* pThread) {OnRun(pThread); },
-			[this](CELLThread* pThread) {ClearClients(); });
+			[this](CellThread* pThread) {OnRun(pThread); },
+			[this](CellThread* pThread) {ClearClients(); });
 	}
 
 	int getClientCount()
@@ -284,7 +284,7 @@ private:
 	int _id = -1;
 	bool _clients_changed = true;
 	bool _bRun = false;
-	CELLThread _thread;
+	CellThread _thread;
 };
 
 

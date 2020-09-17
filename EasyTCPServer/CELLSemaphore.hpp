@@ -6,15 +6,15 @@
 #include <condition_variable>
 
 
-class CELLSemaphore
+class CellSemaphore
 {
 public:
-	CELLSemaphore()
+	CellSemaphore()
 	{
 
 	}
 
-	~CELLSemaphore()
+	~CellSemaphore()
 	{
 
 	}
