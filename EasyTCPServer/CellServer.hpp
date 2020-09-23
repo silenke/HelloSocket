@@ -80,12 +80,13 @@ public:
 			}
 
 			fd_set fdRead;
-
-			FD_ZERO(&fdRead);
+			fd_set fdWrite;
+			//fd_set fdExc;
 
 			if (_clients_changed)
 			{
 				_clients_changed = false;
+				FD_ZERO(&fdRead);
 				_maxSock = _clients.begin()->first;
 				for (auto p : _clients)
 				{
@@ -99,8 +100,11 @@ public:
 				memcpy(&fdRead, &_fdRead_bak, sizeof(fd_set));
 			}
 
+			memcpy(&fdWrite, &_fdRead_bak, sizeof(fd_set));
+			//memcpy(&fdExc, &_fdRead_bak, sizeof(fd_set));
+
 			timeval t{ 0, 1 };
-			int ret = select(_maxSock + 1, &fdRead, nullptr, nullptr, &t);
+			int ret = select(_maxSock + 1, &fdRead, &fdWrite, nullptr, &t);
 			//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
 			if (ret < 0)
 			{
@@ -115,6 +119,18 @@ public:
 			//}
 
 			ReadData(fdRead);
+			WriteData(fdWrite);
+			//WriteData(fdExc);
+
+			//std::cout << "CellServer<" << _id
+			//	<< ">.OnRun.select：fdRead=" << fdRead.fd_count
+			//	<< "，fdWrite=" << fdWrite.fd_count << std::endl;
+			//if (fdExc.fd_count > 0)
+			//{
+			//	std::cout << "CellServer<" << _id
+			//		<< "，fdExc=" << fdExc.fd_count << std::endl;
+			//}
+
 			CheckTime();
 		}
 
@@ -139,12 +155,48 @@ public:
 				_clients.erase(it++);
 				_clients_changed = true;
 			}
+			//else
+			//{	// 定时发送检测
+			//	it->second->checkSend(dt);
+				it++;
+			//}
+		}
+	}
+
+	void OnClientLeave(CellClient* pClient)
+	{
+		if (_pNetEvent)
+			_pNetEvent->OnNetLeave(pClient);
+		delete pClient;
+		_clients_changed = true;
+	}
+
+	void WriteData(fd_set& fdWrite)
+	{
+#ifdef _WIN32
+		for (int i = 0; i < fdWrite.fd_count; i++)
+		{
+			auto pClient = _clients[fdWrite.fd_array[i]];
+			if (-1 == pClient->SendDataReal())
+			{
+				OnClientLeave(pClient);
+				_clients.erase(fdWrite.fd_array[i]);
+			}
+		}
+#else
+		for (auto it = _clients.begin(); it != _clients.end(); )
+		{
+			if (FD_ISSET(it->first, &fdWrite) && -1 == it->second->SendDataReal())
+			{
+				OnClientLeave(it->second);
+				_clients.erase(it++);
+			}
 			else
-			{	// 定时发送检测
-				it->second->checkSend(dt);
+			{
 				it++;
 			}
 		}
+#endif	// _WIN32
 	}
 
 	void ReadData(fd_set& fdRead)
@@ -155,11 +207,8 @@ public:
 			auto pClient = _clients[fdRead.fd_array[i]];
 			if (-1 == RecvData(pClient))
 			{
-				if (_pNetEvent)
-					_pNetEvent->OnNetLeave(pClient);
-				delete pClient;
+				OnClientLeave(pClient);
 				_clients.erase(fdRead.fd_array[i]);
-				_clients_changed = true;
 			}
 		}
 #else
@@ -167,11 +216,8 @@ public:
 		{
 			if (FD_ISSET(it->first, &fdRead) && -1 == RecvData(it->second))
 			{
-				if (_pNetEvent)
-					_pNetEvent->OnNetLeave(it->second);
-				delete it->second;
+				OnClientLeave(it->second);
 				_clients.erase(it++);
-				_clients_changed = true;
 			}
 			else
 			{

@@ -56,7 +56,7 @@ void cmdThread()
 
 
 const int cCount = 16;
-const int tCount = 4;
+const int tCount = 1;
 EasyTCPClient* clients[cCount];
 std::atomic_int sendCount = 0;
 std::atomic_int readCount = 0;
@@ -64,10 +64,13 @@ std::atomic_int readCount = 0;
 
 void recvThread(int begin, int end)
 {
+	CELLTimestamp t;
 	while (g_bRun)
 	{
 		for (int i = begin; i < end; i++)
 		{
+			//if (t.getElapsedSecond() > 3.0 && i == begin)
+			//	continue;
 			clients[i]->OnRun();
 		}
 	}
@@ -121,8 +124,8 @@ void sendThread(int id)
 				sendCount++;
 			}
 		}
-		std::chrono::milliseconds t(10);
-		std::this_thread::sleep_for(t);
+		//std::chrono::milliseconds t(10);
+		//std::this_thread::sleep_for(t);
 	}
 
 	for (int i = begin; i < end; i++)

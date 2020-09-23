@@ -55,8 +55,15 @@ class MyServer : public EasyTCPServer
 			pClient->resetDTHeart();
 
 			// 发送数据
-			netmsg_LoginResult* pResult = new netmsg_LoginResult();
-			pCellServer->addSendTask(pClient, pResult);
+			//netmsg_LoginResult* pResult = new netmsg_LoginResult();
+			//pCellServer->addSendTask(pClient, pResult);
+			netmsg_LoginResult res;
+			if (SOCKET_ERROR == pClient->SendData(&res))
+			{
+				// 发送缓冲区满，消息未发送
+				//std::cout << "<Socket=" << pClient->sockfd()
+				//	<< "> Send Full" << std::endl;
+			}
 		}
 		break;
 		case CMD_LOGOUT:

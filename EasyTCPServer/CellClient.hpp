@@ -74,12 +74,13 @@ public:
 	// 立即发送缓冲区数据
 	int SendDataReal()
 	{
-		int ret = SOCKET_ERROR;
+		int ret = 0;
 
-		if (_lastSendPos > 0 && SOCKET_ERROR != _sockfd)
+		if (_lastSendPos > 0 && INVALID_SOCKET != _sockfd)
 		{
 			ret = send(_sockfd, _szSendBuf, _lastSendPos, 0);
 			_lastSendPos = 0;
+			_sendBuffFullCount = 0;
 			resetDTSend();
 		}
 		return ret;
@@ -93,23 +94,22 @@ public:
 		int nSendLen = header->len;
 		const char* pSendData = (const char*)header;
 
-		while (_lastSendPos + nSendLen >= SEND_BUFF_SIZE)
+		if (_lastSendPos + nSendLen <= SEND_BUFF_SIZE)
 		{
-			int nCopyLen = SEND_BUFF_SIZE - _lastSendPos;
-			memcpy(_szSendBuf + _lastSendPos, pSendData, nCopyLen);
-			ret = send(_sockfd, _szSendBuf, SEND_BUFF_SIZE, 0);
-			pSendData += nCopyLen;
-			nSendLen -= nCopyLen;
-			_lastSendPos = 0;
-			resetDTSend();
+			memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);
+			_lastSendPos += nSendLen;
 
-			if (SOCKET_ERROR == ret)
+			if (SEND_BUFF_SIZE == _lastSendPos)
 			{
-				return ret;
+				_sendBuffFullCount++;
 			}
+
+			return nSendLen;
 		}
-		memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);
-		_lastSendPos += nSendLen;
+		else
+		{
+			_sendBuffFullCount++;
+		}
 
 		return ret;
 	}
@@ -163,6 +163,7 @@ private:
 	int _lastSendPos = 0;
 	time_t _dtHeart;
 	time_t _dtSend;
+	int _sendBuffFullCount = 0;
 };
 
 
