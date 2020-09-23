@@ -1,15 +1,224 @@
-Info【2020-8-23 22:25:17】CELLlog::setLogPath successed，<serverLog.txt, w>
-Info【2020-8-23 22:25:17】<socket=212>创建套接字成功！
-Info【2020-8-23 22:25:17】绑定端口<6100>成功！
-Info【2020-8-23 22:25:17】<socket=212>监听端口成功！
-Info【2020-8-23 22:25:18】thread<4>，time<4607197861643139661>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:19】thread<4>，time<4607202441803960697>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:20】thread<4>，time<4607202081515990507>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:21】thread<4>，time<4607207589418334781>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:22】thread<4>，time<4607214430386168757>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:23】thread<4>，time<4607220348116079122>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:24】thread<4>，time<4607219758144527937>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:25】thread<4>，time<4607216970416358594>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:26】thread<4>，time<4607213808889420180>，socket<212>，clients<0>，recv<0>，msg<0>
-Info【2020-8-23 22:25:27】thread<4>，time<4607215623840070010>，socket<212>，clients<85>，recv<0>，msg<0>
-Info【2020-8-23 22:25:28】thread<4>，time<4607206805791999619>，socket<212>，clients<100>，recv<497>，msg<497>
+Info【2020-8-23 23:36:4】CELLlog::setLogPath successed，<serverLog.txt, w>
+Info【2020-8-23 23:36:4】<socket=200>创建套接字成功！
+Info【2020-8-23 23:36:4】绑定端口<6100>成功！
+Info【2020-8-23 23:36:4】<socket=200>监听端口成功！
+Info【2020-8-23 23:36:5】thread<4>，time<4607208287476277024>，socket<200>，clients<0>，recv<0>，msg<0>
+Info【2020-8-23 23:36:6】thread<4>，time<4607211142758440777>，socket<200>，clients<0>，recv<0>，msg<0>
+Info【2020-8-23 23:36:7】thread<4>，time<4607224622032125497>，socket<200>，clients<53>，recv<0>，msg<0>
+Info【2020-8-23 23:36:8】thread<4>，time<4607204391862599348>，socket<200>，clients<100>，recv<343>，msg<343>
+Info【2020-8-23 23:36:9】thread<4>，time<4607201919386403922>，socket<200>，clients<100>，recv<652>，msg<652>
+Info【2020-8-23 23:36:10】thread<4>，time<4607202162580783800>，socket<200>，clients<100>，recv<572>，msg<572>
+Info【2020-8-23 23:36:11】thread<4>，time<4607202126551986781>，socket<200>，clients<100>，recv<622>，msg<622>
+Info【2020-8-23 23:36:12】				server<3>.CellClient<3>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<7>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<11>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<4>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<0>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<12>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<8>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<15>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<19>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<24>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<20>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<16>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<28>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<36>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<32>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<44>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<40>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<48>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<52>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<56>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<60>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<68>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<64>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<5>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<1>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<13>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<9>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<73>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<57>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<45>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<72>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<76>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<29>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<80>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<69>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<84>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<53>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<41>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<92>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<25>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<96>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<65>.~CellClient
+Info【2020-8-23 23:36:12】				server<0>.CellClient<88>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<37>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<21>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<61>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<49>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<33>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<17>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<93>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<77>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<97>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<81>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<85>.~CellClient
+Info【2020-8-23 23:36:12】				server<1>.CellClient<89>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<2>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<10>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<6>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<58>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<46>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<14>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<30>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<70>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<54>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<59>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<42>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<47>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<26>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<31>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<66>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<71>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<38>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<55>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<22>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<43>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<27>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<62>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<67>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<50>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<39>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<23>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<34>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<63>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<18>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<51>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<35>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<91>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<75>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<95>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<79>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<99>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<83>.~CellClient
+Info【2020-8-23 23:36:12】				server<3>.CellClient<87>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<90>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<74>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<94>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<78>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<98>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<82>.~CellClient
+Info【2020-8-23 23:36:12】				server<2>.CellClient<86>.~CellClient
+Info【2020-8-23 23:36:12】thread<4>，time<4607221996433542740>，socket<200>，clients<0>，recv<297>，msg<297>
+Info【2020-8-23 23:36:13】thread<4>，time<4607230701891622447>，socket<200>，clients<0>，recv<0>，msg<0>
+Info【2020-8-23 23:36:14】thread<4>，time<4607236777247519770>，socket<200>，clients<0>，recv<0>，msg<0>
+Info【2020-8-23 23:36:15】thread<4>，time<4607222897153468214>，socket<200>，clients<0>，recv<0>，msg<0>
+Info【2020-8-23 23:36:16】thread<4>，time<4607202198609580819>，socket<200>，clients<93>，recv<0>，msg<0>
+Info【2020-8-23 23:36:17】thread<4>，time<4607202149069984918>，socket<200>，clients<100>，recv<398>，msg<398>
+Info【2020-8-23 23:36:18】thread<4>，time<4607202198609580819>，socket<200>，clients<100>，recv<672>，msg<672>
+Info【2020-8-23 23:36:19】thread<4>，time<4607202090523189762>，socket<200>，clients<100>，recv<640>，msg<640>
+Info【2020-8-23 23:36:20】thread<4>，time<4607202239141977465>，socket<200>，clients<100>，recv<679>，msg<679>
+Info【2020-8-23 23:36:21】thread<4>，time<4607202068005191625>，socket<200>，clients<100>，recv<622>，msg<622>
+Info【2020-8-23 23:36:22】				server<2>.CellClient<102>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<106>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<110>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<114>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<118>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<122>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<126>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<130>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<134>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<138>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<142>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<146>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<101>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<174>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<150>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<105>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<109>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<113>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<117>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<121>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<125>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<154>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<133>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<129>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<137>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<141>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<145>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<158>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<149>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<166>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<162>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<170>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<169>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<157>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<178>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<153>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<161>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<165>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<182>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<186>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<185>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<173>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<177>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<181>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<190>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<103>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<189>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<107>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<194>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<111>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<193>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<115>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<119>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<123>.~CellClient
+Info【2020-8-23 23:36:22】				server<1>.CellClient<197>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<155>.~CellClient
+Info【2020-8-23 23:36:22】				server<2>.CellClient<198>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<127>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<131>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<139>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<135>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<151>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<143>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<100>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<147>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<172>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<167>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<104>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<159>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<160>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<163>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<108>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<171>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<112>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<175>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<116>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<179>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<120>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<183>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<124>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<187>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<128>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<132>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<136>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<140>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<144>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<148>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<152>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<156>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<164>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<168>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<176>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<180>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<191>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<195>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<196>.~CellClient
+Info【2020-8-23 23:36:22】				server<3>.CellClient<199>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<184>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<188>.~CellClient
+Info【2020-8-23 23:36:22】				server<0>.CellClient<192>.~CellClient
+Info【2020-8-23 23:36:22】thread<4>，time<4607222118030732679>，socket<200>，clients<0>，recv<297>，msg<297>
+Info【2020-8-23 23:36:23】thread<4>，time<4607231944885119601>，socket<200>，clients<0>，recv<0>，msg<0>
+Info【2020-8-23 23:36:24】thread<4>，time<4607240082889646260>，socket<200>，clients<0>，recv<0>，msg<0>

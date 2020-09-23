@@ -127,6 +127,15 @@ public:
 			//}
 
 			CheckTime();
+
+			for (auto it = _clients.begin(); it != _clients.end(); )
+			{
+				if (!it->second)
+				{
+					_clients.erase(it++);
+				}
+				else it++;
+			}
 		}
 
 		CELLlog::Info("\t\t\tCellServer<%d>.OnRun exit\n", _id);
@@ -141,7 +150,7 @@ public:
 		for (auto it = _clients.begin(); it != _clients.end(); )
 		{
 			// 心跳检测
-			if (it->second->checkHeart(dt))
+			if (it->second && it->second->checkHeart(dt))
 			{
 				if (_pNetEvent)
 					_pNetEvent->OnNetLeave(it->second);
@@ -149,7 +158,7 @@ public:
 				_clients.erase(it++);
 				_clients_changed = true;
 			}
-			//else
+			else
 			//{	// 定时发送检测
 			//	it->second->checkSend(dt);
 				it++;
@@ -171,7 +180,7 @@ public:
 		for (int i = 0; i < fdWrite.fd_count; i++)
 		{
 			auto pClient = _clients[fdWrite.fd_array[i]];
-			if (-1 == pClient->SendDataReal())
+			if (pClient && -1 == pClient->SendDataReal())
 			{
 				OnClientLeave(pClient);
 				_clients.erase(fdWrite.fd_array[i]);
@@ -199,7 +208,7 @@ public:
 		for (int i = 0; i < fdRead.fd_count; i++)
 		{
 			auto pClient = _clients[fdRead.fd_array[i]];
-			if (-1 == RecvData(pClient))
+			if (pClient && -1 == RecvData(pClient))
 			{
 				OnClientLeave(pClient);
 				_clients.erase(fdRead.fd_array[i]);

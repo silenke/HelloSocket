@@ -84,8 +84,9 @@ public:
 	// 立即发送缓冲区数据
 	int SendDataReal()
 	{
-		resetDTSend();
-		return _sendBuff.write2socket(_sockfd);
+		int ret = _sendBuff.write2socket(_sockfd);
+		if (ret) resetDTSend();
+		return ret;
 	}
 
 	// 发送消息
