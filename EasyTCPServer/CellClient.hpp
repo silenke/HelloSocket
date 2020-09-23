@@ -30,9 +30,8 @@ public:
 
 	~CellClient()
 	{
-		std::cout << "\t\t\t\tserver<" << serverId
-			<< ">.CellClient<" << id
-			<< ">.~CellClient" << std::endl;
+		CELLlog::Info("\t\t\t\tserver<%d>.CellClient<%d>.~CellClient\n",
+			serverId, id);
 
 		if (INVALID_SOCKET == _sockfd)
 		{
@@ -114,8 +113,8 @@ public:
 		_dtHeart += dt;
 		if (_dtHeart >= CLIENT_HEART_DEAD_TIME)
 		{
-			std::cout << "checkHeart dead£ºsocket=" << _sockfd
-				<< "£¬time=" << _dtHeart << std::endl;
+			CELLlog::Info("checkHeart dead£ºsocket=<%lld>£¬time=<%lld>\n",
+				_sockfd, _dtHeart);
 			return true;
 		}
 		return false;

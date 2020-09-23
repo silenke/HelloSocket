@@ -30,11 +30,9 @@ public:
 
 	void Close()
 	{
-		std::cout << "\t\t\tCellTaskServer<" << serverId
-			<< ">.Close begin" << std::endl;
+		//CELLlog::Info("\t\t\tCellTaskServer<%d>.Close begin\n", serverId);
 		_thread.Close();
-		std::cout << "\t\t\tCellTaskServer<" << serverId
-			<< ">.Close end" << std::endl;
+		//CELLlog::Info("\t\t\tCellTaskServer<%d>.Close end\n", serverId);
 	}
 
 protected:
@@ -66,8 +64,13 @@ protected:
 			}
 			_tasks.clear();
 		}
-		std::cout << "\t\t\t\tCellTaskServer<" << serverId
-			<< ">.OnRun exit" << std::endl;
+		for (auto pTask : _tasksBuf)
+		{
+			pTask();
+		}
+		_tasks.clear();
+
+		//CELLlog::Info("\t\t\t\tCellTaskServer<%d>.OnRun exit\n", serverId);
 	}
 
 public:

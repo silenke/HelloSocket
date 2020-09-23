@@ -47,14 +47,14 @@ public:
 		if (INVALID_SOCKET != _sock)
 		{
 			Close();
-			std::cout << "<socket=" << _sock << ">关闭旧连接" << std::endl;
+			CELLlog::Info("<socket=%lld>关闭旧连接\n", _sock);
 		}
 
 		_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (INVALID_SOCKET == _sock) {
-			std::cout << "错误，创建套接字失败！" << std::endl;
+			CELLlog::Info("错误，创建套接字失败！\n");
 		}
-		std::cout << "<socket=" << _sock << ">创建套接字成功！" << std::endl;
+		CELLlog::Info("<socket=%lld>创建套接字成功！\n", _sock);
 	}
 
 	// 绑定端口
@@ -77,10 +77,10 @@ public:
 #endif
 		int ret = bind(_sock, (sockaddr*)&_sin, sizeof(_sin));
 		if (SOCKET_ERROR == ret) {
-			std::cout << "错误，绑定端口<" << port << ">失败！" << std::endl;
+			CELLlog::Info("错误，绑定端口<%d>失败！\n", port);
 		}
 		else {
-			std::cout << "绑定端口<" << port << ">成功！" << std::endl;
+			CELLlog::Info("绑定端口<%d>成功！\n", port);
 		}
 		return ret;
 	}
@@ -90,10 +90,10 @@ public:
 	{
 		int ret = listen(_sock, n);
 		if (SOCKET_ERROR == ret) {
-			std::cout << "<socket=" << _sock << ">错误，监听端口失败！" << std::endl;
+			CELLlog::Info("<socket=%d>错误，监听端口失败！\n", _sock);
 		}
 		else {
-			std::cout << "<socket=" << _sock << ">监听端口成功！" << std::endl;
+			CELLlog::Info("<socket=%d>监听端口成功！\n", _sock);
 		}
 		return ret;
 	}
@@ -109,7 +109,7 @@ public:
 		cSock = accept(_sock, (sockaddr*)&clientAddr, &addrLen);
 		if (INVALID_SOCKET == cSock)
 		{
-			std::cout << "<socket=" << _sock << ">错误，接收到无效的客户端！" << std::endl;
+			CELLlog::Info("<socket=%d>错误，接收到无效的客户端！\n", _sock);
 		}
 		else
 		{
@@ -148,7 +148,7 @@ public:
 	// 关闭套接字
 	void Close()
 	{
-		std::cout << "EasyTCPServer.Close begin" << std::endl;
+		CELLlog::Info("EasyTCPServer.Close begin\n");
 		//
 		_thread.Close();
 		if (INVALID_SOCKET == _sock)
@@ -174,7 +174,7 @@ public:
 		// _clients.clear();
 		_sock = INVALID_SOCKET;
 		//
-		std::cout << "EasyTCPServer.Close end" << std::endl;
+		CELLlog::Info("EasyTCPServer.Close end\n");
 	}
 
 	// 计数输出每秒收到的网络消息
@@ -183,13 +183,8 @@ public:
 		auto t1 = _tTime.getElapsedSecond();
 		if (t1 >= 1.0)
 		{
-			std::cout << "thread<" << _cellServers.size()
-				<< ">，time<" << t1
-				<< ">，socket<" << _sock
-				<< ">，clients<" << _clientCount
-				<< ">，recv<" << (int)(_recvCount / t1)
-				<< ">，msg<" << (int)(_msgCount / t1)
-				<< ">" << std::endl;
+			CELLlog::Info("thread<%lld>，time<%lld>，socket<%d>，clients<%d>，recv<%d>，msg<%d>\n",
+				_cellServers.size(), t1, _sock, (int)_clientCount, (int)(_recvCount / t1), (int)(_msgCount / t1));
 			_msgCount = 0;
 			_recvCount = 0;
 			_tTime.update();
@@ -251,7 +246,7 @@ private:
 			//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
 			if (ret < 0)
 			{
-				std::cout << "EasyTCPServer.OnRun select error！" << std::endl;
+				CELLlog::Info("EasyTCPServer.OnRun select error！\n");
 				pThread->Exit();
 				break;
 			}

@@ -61,8 +61,7 @@ class MyServer : public EasyTCPServer
 			if (SOCKET_ERROR == pClient->SendData(&res))
 			{
 				// 发送缓冲区满，消息未发送
-				std::cout << "<Socket=" << pClient->sockfd()
-					<< "> Send Full" << std::endl;
+				CELLlog::Info("<Socket=%lld> Send Full\n", pClient->sockfd());
 			}
 		}
 		break;
@@ -87,8 +86,8 @@ class MyServer : public EasyTCPServer
 		break;
 		default:
 		{
-			std::cout << "<socket=" << pClient->sockfd() << ">收到未知命令，"
-				<< "数据长度：" << header->len << std::endl;
+			CELLlog::Info("<Socket=%lld> 收到未知命令，数据长度：%d\n",
+				pClient->sockfd(), header->len);
 			netmsg_DataHeader* pResult = new netmsg_DataHeader();
 			pCellServer->addSendTask(pClient, pResult);
 		}
@@ -100,6 +99,8 @@ class MyServer : public EasyTCPServer
 
 int main()
 {
+	CELLlog::Instance().setLogPath("serverLog.txt", "w");
+
 	MyServer server;
 	server.InitSocket();
 	server.Bind(nullptr, 6100);
@@ -116,20 +117,19 @@ int main()
 		std::cin >> cmdBuff;
 		if (!strcmp(cmdBuff, "exit")) {
 			server.Close();
-			std::cout << "收到退出命令，结束任务！" << std::endl;
+			CELLlog::Info("收到退出命令，结束任务！\n");
 			break;
 		}
 		else {
-			std::cout << "不支持的命令，请重新输入！" << std::endl;
+			CELLlog::Info("不支持的命令，请重新输入！\n");
 		}
 	}
 
-	std::cout << "已退出！" << std::endl;
+	CELLlog::Info("已退出！\n");
 
-	while (true)
-	{
-		Sleep(1);
-	}
-	
+//#ifdef _WIN32
+//	while (true) Sleep(1);
+//#endif // _WIN32
+
 	return 0;
 }

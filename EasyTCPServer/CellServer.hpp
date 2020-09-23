@@ -29,11 +29,9 @@ public:
 
 	~CellServer()
 	{
-		std::cout << "\tCellServer<" << _id
-			<< ">.~CellServer exit begin" << std::endl;
+		CELLlog::Info("\tCellServer<%d>.~CellServer exit begin\n", _id);
 		Close();
-		std::cout << "\tCellServer<" << _id
-			<< ">.~CellServer exit end" << std::endl;
+		CELLlog::Info("\tCellServer<%d>.~CellServer exit end\n", _id);
 	}
 
 	void setEventObj(INetEvent* event)
@@ -44,12 +42,10 @@ public:
 	// 关闭套接字
 	void Close()
 	{
-		std::cout << "\t\tCellServer<" << _id
-			<< ">.Close exit begin" << std::endl;
-			_taskServer.Close();
-			_thread.Close();
-		std::cout << "\t\tCellServer<" << _id
-			<< ">.Close exit end" << std::endl;
+		CELLlog::Info("\t\tCellServer<%d>.Close exit begin\n", _id);
+		_taskServer.Close();
+		_thread.Close();
+		CELLlog::Info("\t\tCellServer<%d>.Close exit end\n", _id);
 	}
 
 	// 处理网络消息
@@ -108,8 +104,7 @@ public:
 			//std::cout << "select ret = " << ret << "，count = " << _nCount++ << std::endl;
 			if (ret < 0)
 			{
-				std::cout << "CellServer<" << _id
-					<< ">.OnRun.select Error！" << std::endl;
+				CELLlog::Info("CellServer<%d>.OnRun.select Error！\n", _id);
 				pThread->Exit();
 				break;
 			}
@@ -134,8 +129,7 @@ public:
 			CheckTime();
 		}
 
-		std::cout << "\t\t\tCellServer<" << _id
-			<< ">.OnRun exit" << std::endl;
+		CELLlog::Info("\t\t\tCellServer<%d>.OnRun exit\n", _id);
 	}
 
 	void CheckTime()

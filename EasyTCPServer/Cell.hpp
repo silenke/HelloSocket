@@ -28,6 +28,7 @@
 #include "MessageHeader.hpp"
 #include "CELLTimestamp.hpp"
 #include "CELLTask.hpp"
+#include "CELLlog.hpp"
 
 
 #ifndef RECV_BUFF_SIZE
