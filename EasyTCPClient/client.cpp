@@ -55,8 +55,8 @@ void cmdThread()
 }
 
 
-const int cCount = 16;
-const int tCount = 1;
+const int cCount = 100;
+const int tCount = 4;
 EasyTCPClient* clients[cCount];
 std::atomic_int sendCount = 0;
 std::atomic_int readCount = 0;
@@ -124,8 +124,8 @@ void sendThread(int id)
 				sendCount++;
 			}
 		}
-		//std::chrono::milliseconds t(10);
-		//std::this_thread::sleep_for(t);
+		std::chrono::milliseconds t(99);
+		std::this_thread::sleep_for(t);
 	}
 
 	for (int i = begin; i < end; i++)

@@ -3,6 +3,7 @@
 
 
 #include "Cell.hpp"
+#include "CELLBuffer.hpp"
 
 #include <iostream>
 
@@ -15,7 +16,9 @@
 class CellClient
 {
 public:
-	CellClient(SOCKET sockfd = INVALID_SOCKET)
+	CellClient(SOCKET sockfd = INVALID_SOCKET) :
+		_recvBuff(RECV_BUFF_SIZE),
+		_sendBuff(SEND_BUFF_SIZE)
 	{
 		static int n = 0;
 		id = n++;
@@ -49,19 +52,27 @@ public:
 		return _sockfd;
 	}
 
-	char* msgBuf()
+	int recvData()
 	{
-		return _szMsgBuf;
+		return _recvBuff.read4socket(_sockfd);
 	}
 
-	int getLast()
+	bool hasMsg()
 	{
-		return _lastPos;
+		return _recvBuff.hasMsg();
 	}
 
-	void setLast(int pos)
+	netmsg_DataHeader* front_msg()
 	{
-		_lastPos = pos;
+		return (netmsg_DataHeader*)_recvBuff.data();
+	}
+
+	void pop_front_msg()
+	{
+		if (hasMsg())
+		{
+			_recvBuff.pop(front_msg()->len);
+		}
 	}
 
 	// 立即发送数据
@@ -74,44 +85,18 @@ public:
 	// 立即发送缓冲区数据
 	int SendDataReal()
 	{
-		int ret = 0;
-
-		if (_lastSendPos > 0 && INVALID_SOCKET != _sockfd)
-		{
-			ret = send(_sockfd, _szSendBuf, _lastSendPos, 0);
-			_lastSendPos = 0;
-			_sendBuffFullCount = 0;
-			resetDTSend();
-		}
-		return ret;
+		resetDTSend();
+		return _sendBuff.write2socket(_sockfd);
 	}
 
 	// 发送消息
 	int SendData(netmsg_DataHeader* header)
 	{
-		int ret = SOCKET_ERROR;
-
-		int nSendLen = header->len;
-		const char* pSendData = (const char*)header;
-
-		if (_lastSendPos + nSendLen <= SEND_BUFF_SIZE)
+		if (_sendBuff.push((const char*)header, header->len))
 		{
-			memcpy(_szSendBuf + _lastSendPos, pSendData, nSendLen);
-			_lastSendPos += nSendLen;
-
-			if (SEND_BUFF_SIZE == _lastSendPos)
-			{
-				_sendBuffFullCount++;
-			}
-
-			return nSendLen;
+			return header->len;
 		}
-		else
-		{
-			_sendBuffFullCount++;
-		}
-
-		return ret;
+		return SOCKET_ERROR;
 	}
 
 	void resetDTHeart()
@@ -157,10 +142,8 @@ public:
 
 private:
 	SOCKET _sockfd;
-	char _szMsgBuf[RECV_BUFF_SIZE * 10]{};
-	int _lastPos = 0;
-	char _szSendBuf[SEND_BUFF_SIZE * 10]{};
-	int _lastSendPos = 0;
+	CELLBuffer _recvBuff;
+	CELLBuffer _sendBuff;
 	time_t _dtHeart;
 	time_t _dtSend;
 	int _sendBuffFullCount = 0;

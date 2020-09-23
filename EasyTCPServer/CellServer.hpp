@@ -234,26 +234,16 @@ public:
 	int RecvData(CellClient* pClient)
 	{
 		// 接收数据
-		int nLen = recv(pClient->sockfd(), szRecv, RECV_BUFF_SIZE, 0);
-		_pNetEvent->OnNetRecv(pClient);
-		//std::cout << "nLen = " << nLen << std::endl;
-		if (nLen <= 0) {
-			//std::cout << "<socket=" << _sock << ">已退出，结束任务！" << std::endl;
+		int nLen = pClient->recvData();
+		if (nLen < 0)
+		{
 			return -1;
 		}
-		memcpy(pClient->msgBuf() + pClient->getLast(), szRecv, nLen);	// 直接用这个接收！！！！！！
-		pClient->setLast(pClient->getLast() + nLen);
-		while (pClient->getLast() >= sizeof(netmsg_DataHeader))
+		_pNetEvent->OnNetRecv(pClient);
+		while (pClient->hasMsg())
 		{
-			netmsg_DataHeader* header = (netmsg_DataHeader*)pClient->msgBuf();
-			if (pClient->getLast() >= header->len)
-			{
-				int nSize = pClient->getLast() - header->len;
-				OnNetMsg(pClient, header);
-				memcpy(pClient->msgBuf(), pClient->msgBuf() + header->len, nSize);
-				pClient->setLast(nSize);
-			}
-			else break;
+			OnNetMsg(pClient, pClient->front_msg());
+			pClient->pop_front_msg();
 		}
 
 		return 0;

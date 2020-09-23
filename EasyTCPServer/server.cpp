@@ -61,8 +61,8 @@ class MyServer : public EasyTCPServer
 			if (SOCKET_ERROR == pClient->SendData(&res))
 			{
 				// 发送缓冲区满，消息未发送
-				//std::cout << "<Socket=" << pClient->sockfd()
-				//	<< "> Send Full" << std::endl;
+				std::cout << "<Socket=" << pClient->sockfd()
+					<< "> Send Full" << std::endl;
 			}
 		}
 		break;
