@@ -147,6 +147,7 @@
     <ClInclude Include="CELLBuffer.hpp" />
     <ClInclude Include="CellClient.hpp" />
     <ClInclude Include="CELLlog.hpp" />
+    <ClInclude Include="CELLNetWork.hpp" />
     <ClInclude Include="CELLSemaphore.hpp" />
     <ClInclude Include="CellServer.hpp" />
     <ClInclude Include="CellTask.hpp" />

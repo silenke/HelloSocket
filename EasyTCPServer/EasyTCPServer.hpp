@@ -7,6 +7,7 @@
 #include "CellServer.hpp"
 #include "INetEvent.hpp"
 #include "CellThread.hpp"
+#include "CELLNetWork.hpp"
 
 #include <iostream>
 #include <vector>
@@ -37,12 +38,7 @@ public:
 	// 初始化套接字
 	void InitSocket()
 	{
-#ifdef _WIN32
-		// 初始化套接字库
-		WORD version = MAKEWORD(2, 2);
-		WSADATA data;
-		WSAStartup(version, &data);
-#endif
+		CELLNetWork::Init();
 		// 创建套接字
 		if (INVALID_SOCKET != _sock)
 		{
@@ -165,9 +161,6 @@ public:
 #ifdef _WIN32
 		// 关闭套接字
 		closesocket(_sock);
-
-		// 清理套接字库
-		WSACleanup();
 #else
 		close(_sock);
 #endif
