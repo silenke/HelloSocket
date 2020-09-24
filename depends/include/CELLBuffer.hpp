@@ -112,6 +112,11 @@ public:
 		return false;
 	}
 
+	bool needWrite()
+	{
+		return _nLast > 0;
+	}
+
 private:
 	char* _pBuff = nullptr;	// 发送缓冲区
 	int _nLast = 0;	// 缓冲区尾部位置

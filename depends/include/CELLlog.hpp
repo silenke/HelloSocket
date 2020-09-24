@@ -65,7 +65,7 @@ public:
 				//fprintf(pLog->_logFile, ctime(&tNow));
 				std::tm* now = std::gmtime(&tNow);
 				fprintf(pLog->_logFile, "Info");
-				fprintf(pLog->_logFile, "¡¾%d-%d-%d %d:%d:%d¡¿",
+				fprintf(pLog->_logFile, "¡¾%04d-%02d-%02d %02d:%02d:%02d¡¿",
 					now->tm_year + 1900, now->tm_mon, now->tm_mday,
 					now->tm_hour + 8, now->tm_min, now->tm_sec);
 				fprintf(pLog->_logFile, pStr);
@@ -87,7 +87,7 @@ public:
 				//fprintf(pLog->_logFile, ctime(&tNow));
 				std::tm* now = std::gmtime(&tNow);
 				fprintf(pLog->_logFile, "Info");
-				fprintf(pLog->_logFile, "¡¾%d-%d-%d %d:%d:%d¡¿",
+				fprintf(pLog->_logFile, "¡¾%04d-%02d-%02d %02d:%02d:%02d¡¿",
 					now->tm_year + 1900, now->tm_mon, now->tm_mday,
 					now->tm_hour + 8, now->tm_min, now->tm_sec);
 				fprintf(pLog->_logFile, pFormat, args...);

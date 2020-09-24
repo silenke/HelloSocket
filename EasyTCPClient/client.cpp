@@ -1,26 +1,58 @@
-#ifdef _WIN32
-	#define WIN32_LEAN_AND_MEAN
-	#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
-	#include <Windows.h>
-	#include <WinSock2.h>
-
-	#pragma comment(lib, "ws2_32.lib")
-#else
-	#include <unistd.h>
-	#include <arpa/inet.h>
-	#include <string.h>
-
-	#define SOKCET unsigned long long
-	#define INVALID_SOCKET  (SOCKET)(~0)
-	#define SOCKET_ERROR            (-1)
-#endif
-
-
 #include <iostream>
 #include <thread>
 #include "EasyTCPClient.hpp"
 #include "CELLTimestamp.hpp"
+
+
+class MyClient : public EasyTCPClient
+{
+public:
+	// 响应网络消息
+	void OnNetMsg(netmsg_DataHeader* header)
+	{
+		switch (header->cmd)
+		{
+		case CMD_LOGIN_RESULT:
+		{
+			// 接收数据
+			netmsg_LoginResult* login = (netmsg_LoginResult*)header;
+			//std::cout << "<socket=" << _sock << ">收到命令：CMD_LOGIN_RESULT，"
+			//	<< "数据长度：" << header->len << std::endl;
+		}
+		break;
+		case CMD_LOGOUT_RESULT:
+		{
+			// 接收数据
+			netmsg_LogoutResult* logout = (netmsg_LogoutResult*)header;
+			//std::cout << "<socket=" << _sock << ">收到命令：CMD_LOGOUT_RESULT，"
+			//	<< "数据长度：" << header->len << std::endl;
+		}
+		break;
+		case CMD_NEW_USER_JOIN:
+		{
+			// 接收数据
+			netmsg_NewUserJoin* userJoin = (netmsg_NewUserJoin*)header;
+			//std::cout << "<socket=" << _sock << ">收到命令：CMD_NEW_USER_JOIN，"
+			//	<< "数据长度：" << header->len << std::endl;
+		}
+		break;
+		case CMD_ERROR:
+		{
+			//std::cout << "<socket=" << _sock << ">收到命令：CMD_ERROR，"
+			//	<< "数据长度：" << header->len << std::endl;
+		}
+		break;
+		default:
+		{
+			CELLlog::Info("<socket=%lld>收到未知命令，数据长度：%d\n",
+				_pClient->sockfd(), header->len);
+		}
+		break;
+		}
+	}
+
+private:
+};
 
 
 bool g_bRun = true;
@@ -32,7 +64,7 @@ void cmdThread()
 		std::cin >> cmdBuff;
 		if (!strcmp(cmdBuff, "exit")) {
 			g_bRun = false;
-			std::cout << "收到退出命令，结束任务！" << std::endl;
+			CELLlog::Info("收到退出命令，结束任务！\n");
 			return;
 		}
 		//else if (!strcmp(cmdBuff, "login")) {
@@ -48,8 +80,9 @@ void cmdThread()
 		//	strcpy_s(logout.username, "Peppa Pig");
 		//	client->SendData(&logout);
 		//}
-		else {
-			std::cout << "不支持的命令，请重新输入！" << std::endl;
+		else
+		{
+			CELLlog::Info("不支持的命令，请重新输入！\n");
 		}
 	}
 }
@@ -93,13 +126,12 @@ void sendThread(int id)
 			}
 			return;
 		}
-		clients[i] = new EasyTCPClient();
+		clients[i] = new MyClient();
 		clients[i]->Connect("127.0.0.1", 6100);
 		//std::cout << "thread<" << id << ">，Connect=" << i << std::endl;
 	}
 
-	std::cout << "thread<" << id
-		<< ">，Connect<begin=" << begin << "，end=" << end << ">" << std::endl;
+	CELLlog::Info("thread<%d>，Connect<begin=%d，end=%d>\n", id, begin, end);
 
 	readCount++;
 	while (readCount < tCount)	// 等待其他线程
@@ -138,6 +170,8 @@ void sendThread(int id)
 
 int main()
 {
+	CELLlog::Instance().setLogPath("clientLog.txt", "w");
+
 	// 启动UI线程
 	std::thread t1(cmdThread);
 	t1.detach();
@@ -155,18 +189,15 @@ int main()
 		auto t = tTime.getElapsedSecond();
 		if (t >= 1.0)
 		{
-			std::cout << "thread<" << tCount
-				<< ">，time<" << t
-				<< ">，clients<" << cCount
-				<< ">，send<" << sendCount
-				<< ">" << std::endl;
+			CELLlog::Info("thread<%d>，time<%d>，clients<%d>，send<%d>\n",
+				tCount, t, cCount, (int)sendCount);
 			sendCount = 0;
 			tTime.update();
 		}
 		Sleep(1);
 	}
 
-	std::cout << "已退出！" << std::endl;
+	CELLlog::Info("已退出！\n");
 
 	return 0;
 }

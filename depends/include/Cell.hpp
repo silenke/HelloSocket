@@ -29,6 +29,7 @@
 #include "CELLTimestamp.hpp"
 #include "CELLTask.hpp"
 #include "CELLlog.hpp"
+#include "CELLNetWork.hpp"
 
 
 #ifndef RECV_BUFF_SIZE

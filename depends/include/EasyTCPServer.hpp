@@ -7,7 +7,6 @@
 #include "CellServer.hpp"
 #include "INetEvent.hpp"
 #include "CellThread.hpp"
-#include "CELLNetWork.hpp"
 
 #include <iostream>
 #include <vector>

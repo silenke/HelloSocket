@@ -74,6 +74,11 @@ public:
 		}
 	}
 
+	bool needWrite()
+	{
+		return _sendBuff.needWrite();
+	}
+
 	// 立即发送数据
 	void SendDataReal(netmsg_DataHeader* header)
 	{
