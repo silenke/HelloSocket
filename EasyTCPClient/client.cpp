@@ -124,7 +124,7 @@ void sendThread(int id)
 				sendCount++;
 			}
 		}
-		std::chrono::milliseconds t(1000);
+		std::chrono::milliseconds t(99);
 		std::this_thread::sleep_for(t);
 	}
 
